@@ -3,246 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Sede</title>
+    <title>Sede - Control de Inventario</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
-        h2 { text-align: center; color: #333; }
+        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f8fafc; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h2, h3 { text-align: center; color: #1e293b; margin-top: 0; }
         .hidden { display: none; }
-        button { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
-        .btn-primary { background: #007bff; color: white; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .item-row { display: flex; gap: 10px; align-items: center; margin-bottom: 5px; }
-        .loader { text-align: center; color: #666; font-style: italic; }
-        #infoSede { background: #e9ecef; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 15px; font-weight: bold; }
+        .info-badge { background: #e2e8f0; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 0.9em; }
+        label { display: block; margin: 12px 0 5px; font-weight: 600; color: #475569; }
+        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
+        .btn-blue { background: var(--primary); color: white; }
+        .btn-green { background: var(--success); color: white; }
+        .btn-red { background: var(--danger); color: white; }
+        .btn-gray { background: #64748b; color: white; }
+        .loader { text-align: center; padding: 20px; color: #64748b; }
+        .reg-nueva-persona { background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="app" class="card">
-        <div id="loading" class="loader">Cargando sistema...</div>
+<div class="container" id="app">
+    <div id="loading" class="loader">Cargando sistema...</div>
 
-        <div id="loginScreen" class="hidden">
-            <h2>Acceso Restringido</h2>
-            <p style="text-align: center;">Por favor escanea el código QR de la sede nuevamente.</p>
-        </div>
-
-        <div id="menuScreen" class="hidden">
-            <div id="infoSede"></div>
-            <button class="btn-primary" onclick="mostrarIngreso()">📦 Registrar INGRESO</button>
-            <button class="btn-success" onclick="mostrarSalida()">📤 Registrar SALIDA</button>
-            <button class="btn-danger" onclick="cerrarSesion()">🔒 Cerrar / Cambiar Sede</button>
-        </div>
-
-        <div id="ingresoScreen" class="hidden">
-            <h3>Nuevo Ingreso</h3>
-            <input type="text" id="nombreUsuario" placeholder="Nombre Completo">
-            <input type="number" id="ccUsuario" placeholder="Cédula (CC)">
-            
-            <hr>
-            <label>Productos:</label>
-            <div id="listaProductos"></div>
-            <button class="btn-secondary" onclick="agregarCampoProducto()" style="width: auto; font-size: 12px;">+ Agregar Producto</button>
-            
-            <textarea id="obsIngreso" placeholder="Observaciones (Opcional)"></textarea>
-            
-            <button class="btn-primary" onclick="enviarIngreso()">Guardar Ingreso</button>
-            <button class="btn-secondary" onclick="volverMenu()">Volver</button>
-        </div>
-
-        <div id="salidaScreen" class="hidden">
-            <h3>Salida / Devolución</h3>
-            <p>Ingrese la CC para buscar qué tiene asignado:</p>
-            <input type="number" id="buscarCC" placeholder="Cédula a buscar">
-            <button class="btn-primary" onclick="buscarDatosCC()">🔍 Buscar</button>
-            
-            <div id="resultadoBusqueda" class="hidden" style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 10px;">
-                <p><strong>Usuario:</strong> <span id="resNombre"></span></p>
-                <p><strong>Llevó:</strong> <span id="resProductos"></span></p>
-                <hr>
-                <label>¿Qué devuelve?</label>
-                <input type="text" id="prodDevueltos" placeholder="Ej: Todo, o solo X cosa">
-                <label>Estado / Novedades:</label>
-                <select id="estadoMaterial">
-                    <option value="Bueno">Buen Estado</option>
-                    <option value="Dañado">Dañado</option>
-                    <option value="Incompleto">Incompleto</option>
-                </select>
-                <textarea id="obsSalida" placeholder="Observaciones de salida"></textarea>
-                <button class="btn-success" onclick="enviarSalida()">Confirmar Salida</button>
-            </div>
-
-            <button class="btn-secondary" onclick="volverMenu()">Volver</button>
-        </div>
+    <div id="loginScreen" class="hidden">
+        <h2>⚠️ Acceso no detectado</h2>
+        <p>Por favor, escanea el código QR de tu sede para ingresar.</p>
     </div>
 
-    <script>
-        // ==========================================
-        // CONFIGURACIÓN (¡PEGA TU URL AQUÍ!)
-        // ==========================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIYMfmMh58EY6ZeMfjxTZGkCEBy9nbEvOjkUrv_tpNAmiGSaYRMWS78L0Z1qHMezE1/exec"; 
+    <div id="menuScreen" class="hidden">
+        <div id="infoSede" class="info-badge"></div>
+        <button class="btn-blue" onclick="navegar('ingresoScreen')">📥 REGISTRAR INGRESO</button>
+        <button class="btn-green" onclick="navegar('salidaScreen')">📤 REGISTRAR SALIDA</button>
+        <button class="btn-red" onclick="cerrarSesion()">Cerrar Sede</button>
+    </div>
 
-        // Variables Globales
-        let datosSede = null;
+    <div id="ingresoScreen" class="hidden">
+        <h3>Ingreso de Material</h3>
+        <label>Clasificación:</label>
+        <select id="catIn" onchange="cargarSubproductos('in')">
+            <option value="">-- Seleccionar --</option>
+            <option value="Alimentos">Alimentos</option>
+            <option value="Ropa y Textiles">Ropa y Textiles</option>
+            <option value="Medicamentos y Salud">Medicamentos y Salud</option>
+            <option value="Artículos de Higiene y Limpieza">Artículos de Higiene y Limpieza</option>
+            <option value="Útiles Escolares">Útiles Escolares</option>
+            <option value="Herramientas">Herramientas</option>
+            <option value="Tecnología y Electrónica">Tecnología y Electrónica</option>
+            <option value="Misceláneos/Otros">Misceláneos/Otros</option>
+        </select>
 
-        // 1. AL INICIAR: Validar Clave o cargar memoria
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const claveURL = urlParams.get('clave');
-            const sedeGuardada = localStorage.getItem('datosSede');
+        <label>Producto:</label>
+        <select id="prodIn"><option value="">-- Elige clasificación --</option></select>
 
-            if (claveURL) {
-                validarClaveConBackend(claveURL);
-            } else if (sedeGuardada) {
-                datosSede = JSON.parse(sedeGuardada);
-                iniciarInterfaz();
-            } else {
-                mostrarPantalla('loginScreen');
-                document.getElementById('loading').style.display = 'none';
-            }
+        <label>Cantidad:</label>
+        <input type="number" id="cantIn" value="1" min="1">
+
+        <label>Observaciones:</label>
+        <textarea id="obsIn" rows="2"></textarea>
+
+        <button class="btn-blue" onclick="enviarIngreso()">Guardar Entrada</button>
+        <button class="btn-gray" onclick="navegar('menuScreen')">Volver</button>
+    </div>
+
+    <div id="salidaScreen" class="hidden">
+        <h3>Salida / Entrega</h3>
+        <label>Cédula (CC):</label>
+        <input type="number" id="ccSearch" placeholder="Escribe la CC">
+        <button class="btn-blue" onclick="buscarPersona()">🔍 Buscar Persona</button>
+
+        <div id="zonaRegistroSalida" class="hidden">
+            <div id="datosPersonaNueva" class="reg-nueva-persona hidden">
+                <p style="margin:0 0 10px; color:var(--danger); font-weight:bold;">Persona no registrada. Completa:</p>
+                <label>Nombre Completo:</label>
+                <input type="text" id="nombreOut">
+                <label>Rol / Cargo:</label>
+                <select id="rolOut">
+                    <option value="Colaborador">Colaborador</option>
+                    <option value="Area">Area</option>
+                    <option value="Sup General">Sup General</option>
+                    <option value="Sup Auxiliar">Sup Auxiliar</option>
+                    <option value="Líder">Líder</option>
+                    <option value="Hermano mayor">Hermano mayor</option>
+                    <option value="Coordinador El Camino">Coordinador El Camino</option>
+                    <option value="Maestro">Maestro</option>
+                    <option value="Diaconado">Diaconado</option>
+                </select>
+            </div>
+
+            <div id="infoPersonaExistente" class="info-badge hidden" style="margin-top:15px; background:#f0fdf4;"></div>
+
+            <label>Clasificación a entregar:</label>
+            <select id="catOut" onchange="cargarSubproductos('out')">
+                <option value="">-- Seleccionar --</option>
+                <option value="Alimentos">Alimentos</option>
+                <option value="Ropa y Textiles">Ropa y Textiles</option>
+                <option value="Medicamentos y Salud">Medicamentos y Salud</option>
+                <option value="Artículos de Higiene y Limpieza">Artículos de Higiene y Limpieza</option>
+                <option value="Útiles Escolares">Útiles Escolares</option>
+                <option value="Herramientas">Herramientas</option>
+                <option value="Tecnología y Electrónica">Tecnología y Electrónica</option>
+                <option value="Misceláneos/Otros">Misceláneos/Otros</option>
+            </select>
+
+            <label>Producto:</label>
+            <select id="prodOut"><option value="">-- Elige clasificación --</option></select>
+
+            <label>Cantidad:</label>
+            <input type="number" id="cantOut" value="1">
+
+            <label>Estado del material:</label>
+            <select id="estadoOut">
+                <option value="Nuevo">Nuevo / Sellado</option>
+                <option value="Buen Estado">Usado (Buen Estado)</option>
+                <option value="Novedad">Con Novedad / Daño</option>
+            </select>
+
+            <button class="btn-green" onclick="enviarSalida()">Confirmar Salida</button>
+        </div>
+        <button class="btn-gray" onclick="navegar('menuScreen')">Volver</button>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxayHseCRZ2NYM2mcU5zXwZaucSOfz4gDnBo9NPSJXVZKNRpZxw22aT1rogXx4t_f_V/exec"; 
+
+    const CATALOGO = {
+        "Alimentos": ["Comida no perecedera (enlatados, arroz...)", "Bebidas (agua, jugos...)", "Productos perecederos (pan, frutas...)"],
+        "Ropa y Textiles": ["Ropa adultos/jóvenes", "Ropa niños/bebés", "Mantas, cobijas y sábanas", "Calzado y accesorios"],
+        "Medicamentos y Salud": ["Medicamentos venta libre", "Insumos médicos (gasas, alcohol...)"],
+        "Artículos de Higiene y Limpieza": ["Higiene personal", "Limpieza hogar"],
+        "Útiles Escolares": ["Mochilas y estuches", "Cuadernos y lápices", "Libros", "Material de arte"],
+        "Herramientas": ["Herramientas manuales", "Herramientas eléctricas", "Materiales construcción", "Repuestos/Clavos"],
+        "Tecnología y Electrónica": ["Teléfonos/Tablets/Laptops", "Cargadores/Cables", "Pequeños electrodomésticos"],
+        "Misceláneos/Otros": ["Accesorios (perfumes, cremas)", "Juguetes/Adornos/Varios"]
+    };
+
+    let datosSede = null;
+    let personaEncontrada = false;
+
+    window.onload = () => {
+        const params = new URLSearchParams(window.location.search);
+        const clave = params.get('clave');
+        const local = localStorage.getItem('sedeData');
+
+        if (clave) validar(clave);
+        else if (local) { datosSede = JSON.parse(local); iniciar(); }
+        else mostrar('loginScreen');
+    };
+
+    function validar(c) {
+        fetch(`${SCRIPT_URL}?accion=validar&clave=${c}`)
+            .then(r => r.json()).then(d => {
+                if(d.status === "success") {
+                    datosSede = d;
+                    localStorage.setItem('sedeData', JSON.stringify(d));
+                    window.history.replaceState({}, '', window.location.pathname);
+                    iniciar();
+                } else { mostrar('loginScreen'); }
+            });
+    }
+
+    function iniciar() {
+        document.getElementById('infoSede').innerText = `📍 ${datosSede.sede}`;
+        mostrar('menuScreen');
+    }
+
+    function mostrar(id) {
+        ['loading','loginScreen','menuScreen','ingresoScreen','salidaScreen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function navegar(id) { mostrar(id); }
+
+    function cargarSubproductos(tipo) {
+        const cat = document.getElementById(tipo === 'in' ? 'catIn' : 'catOut').value;
+        const pSel = document.getElementById(tipo === 'in' ? 'prodIn' : 'prodOut');
+        pSel.innerHTML = '<option value="">-- Selecciona Producto --</option>';
+        if(CATALOGO[cat]) CATALOGO[cat].forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
+    }
+
+    function buscarPersona() {
+        const cc = document.getElementById('ccSearch').value;
+        if(!cc) return alert("Escribe una CC");
+        
+        fetch(`${SCRIPT_URL}?accion=buscar&cc=${cc}`)
+            .then(r => r.json()).then(d => {
+                document.getElementById('zonaRegistroSalida').classList.remove('hidden');
+                if(d.status === "success") {
+                    personaEncontrada = true;
+                    document.getElementById('datosPersonaNueva').classList.add('hidden');
+                    const info = document.getElementById('infoPersonaExistente');
+                    info.classList.remove('hidden');
+                    info.innerHTML = `👤 ${d.nombre}<br><small>Rol: ${d.rol} | Último: ${d.ultimoProducto}</small>`;
+                } else {
+                    personaEncontrada = false;
+                    document.getElementById('datosPersonaNueva').classList.remove('hidden');
+                    document.getElementById('infoPersonaExistente').classList.add('hidden');
+                }
+            });
+    }
+
+    function enviarIngreso() {
+        const btn = event.target; btn.disabled = true;
+        const data = {
+            tipo: 'ingreso',
+            sede: datosSede.sede,
+            categoria: document.getElementById('catIn').value,
+            producto: document.getElementById('prodIn').value,
+            cantidad: document.getElementById('cantIn').value,
+            observaciones: document.getElementById('obsIn').value
+        };
+        if(!data.producto) return (alert("Elige producto"), btn.disabled=false);
+        postData(data);
+    }
+
+    function enviarSalida() {
+        const btn = event.target; btn.disabled = true;
+        const data = {
+            tipo: 'salida',
+            sede: datosSede.sede,
+            cc: document.getElementById('ccSearch').value,
+            categoria: document.getElementById('catOut').value,
+            producto: document.getElementById('prodOut').value,
+            cantidad: document.getElementById('cantOut').value,
+            estado: document.getElementById('estadoOut').value,
+            observaciones: ""
         };
 
-        function validarClaveConBackend(clave) {
-            fetch(`${SCRIPT_URL}?accion=validar&clave=${clave}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    datosSede = data; // Guardamos info de la sede
-                    localStorage.setItem('datosSede', JSON.stringify(data));
-                    // Limpiamos la URL para que se vea bonita
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    iniciarInterfaz();
-                } else {
-                    alert("Error: " + data.message);
-                    mostrarPantalla('loginScreen');
-                }
-            })
-            .catch(error => alert("Error de conexión: " + error));
+        if(!personaEncontrada) {
+            data.nombre = document.getElementById('nombreOut').value;
+            data.rol = document.getElementById('rolOut').value;
+            if(!data.nombre) return (alert("Escribe el nombre"), btn.disabled=false);
         }
 
-        function iniciarInterfaz() {
-            document.getElementById('infoSede').innerText = `📍 ${datosSede.sede} | Evento: ${datosSede.evento}`;
-            mostrarPantalla('menuScreen');
-            agregarCampoProducto(); // Prepara un campo vacío
-        }
+        if(!data.producto) return (alert("Elige producto"), btn.disabled=false);
+        postData(data);
+    }
 
-        // --- FUNCIONES DE NAVEGACIÓN ---
-        function mostrarPantalla(id) {
-            ['loading', 'loginScreen', 'menuScreen', 'ingresoScreen', 'salidaScreen'].forEach(s => {
-                document.getElementById(s).classList.add('hidden');
-            });
-            document.getElementById(id).classList.remove('hidden');
-        }
-        function volverMenu() { mostrarPantalla('menuScreen'); }
-        function cerrarSesion() {
-            localStorage.removeItem('datosSede');
-            location.reload();
-        }
+    function postData(d) {
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(d) })
+            .then(r => r.json()).then(res => {
+                if(res.status === "success") { alert("✅ Guardado"); location.reload(); }
+            }).catch(e => alert("Error al guardar"));
+    }
 
-        // --- LÓGICA DE INGRESO ---
-        function mostrarIngreso() { mostrarPantalla('ingresoScreen'); }
-
-        function agregarCampoProducto() {
-            const div = document.createElement('div');
-            div.className = 'item-row';
-            div.innerHTML = `
-                <input type="text" class="prod-name" placeholder="Producto (Ej: Radio)" style="flex:2">
-                <input type="number" class="prod-qty" placeholder="Cant." style="flex:1" value="1">
-                <button class="btn-danger" onclick="this.parentElement.remove()" style="width:auto; padding:5px;">X</button>
-            `;
-            document.getElementById('listaProductos').appendChild(div);
-        }
-
-        function enviarIngreso() {
-            const nombre = document.getElementById('nombreUsuario').value;
-            const cc = document.getElementById('ccUsuario').value;
-            
-            // Recopilar productos
-            let productosArr = [];
-            let cantArr = [];
-            document.querySelectorAll('.item-row').forEach(row => {
-                const p = row.querySelector('.prod-name').value;
-                const q = row.querySelector('.prod-qty').value;
-                if(p) { productosArr.push(p); cantArr.push(q); }
-            });
-
-            if (!nombre || !cc || productosArr.length === 0) {
-                alert("Por favor llena todos los campos obligatorios.");
-                return;
-            }
-
-            const datos = {
-                tipo: 'ingreso',
-                sede: datosSede.sede,
-                nombre: nombre,
-                cc: cc,
-                productos: productosArr.join(", "),
-                cantidades: cantArr.join(", "),
-                observaciones: document.getElementById('obsIngreso').value
-            };
-
-            enviarAlBackend(datos);
-        }
-
-        // --- LÓGICA DE SALIDA ---
-        function mostrarSalida() { mostrarPantalla('salidaScreen'); }
-
-        function buscarDatosCC() {
-            const cc = document.getElementById('buscarCC').value;
-            if(!cc) return alert("Ingresa una cédula");
-
-            document.getElementById('loading').style.display = 'block'; // Reusamos loader pequeño visualmente si quisieramos, o bloqueo
-            
-            fetch(`${SCRIPT_URL}?accion=buscar&cc=${cc}`)
-            .then(r => r.json())
-            .then(data => {
-                if(data.status === "success"){
-                    document.getElementById('resultadoBusqueda').classList.remove('hidden');
-                    document.getElementById('resNombre').innerText = data.nombre;
-                    document.getElementById('resProductos').innerText = `${data.productos} (Cant: ${data.cantidades})`;
-                    // Autocompletar devolución
-                    document.getElementById('prodDevueltos').value = data.productos; 
-                } else {
-                    alert(data.message);
-                    document.getElementById('resultadoBusqueda').classList.add('hidden');
-                }
-            });
-        }
-
-        function enviarSalida() {
-            const cc = document.getElementById('buscarCC').value;
-            const datos = {
-                tipo: 'salida',
-                sede: datosSede.sede,
-                cc: cc,
-                productosDevueltos: document.getElementById('prodDevueltos').value,
-                estadoMaterial: document.getElementById('estadoMaterial').value,
-                observaciones: document.getElementById('obsSalida').value
-            };
-            enviarAlBackend(datos);
-        }
-
-        // --- ENVÍO GENÉRICO ---
-        function enviarAlBackend(objetoDatos) {
-            // Convertimos a string plano para evitar problemas de CORS complejos
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(objetoDatos)
-            })
-            .then(r => r.json())
-            .then(data => {
-                if(data.status === "success") {
-                    alert("✅ Guardado correctamente");
-                    location.reload(); // Recarga para limpiar formulario
-                } else {
-                    alert("❌ Error: " + data.message);
-                }
-            })
-            .catch(e => alert("Error de red: " + e));
-        }
-    </script>
+    function cerrarSesion() { localStorage.clear(); location.reload(); }
+</script>
 </body>
 </html>
