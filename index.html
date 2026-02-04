@@ -125,7 +125,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQc1yPZtHaX3OY97BJ3J1Mo8oP8Mme_64xk54h9jfwB5zrB-W04WEn1LFRcDsm-tNY/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZq1jQJjZT9KsS-dYTVGS6If149aZTmCIaRBztlAmmBEkixZ2Ea1mfr3zu0a3gZ7YU/exec";
     
     // Configuración de Categorías e Iconos
     const CATS = [
@@ -150,21 +150,61 @@
         "Otros": ["Juguetes", "Muebles", "Decoración", "Otro"]
     };
 
-    let flow = { start: 0, sede: "", cat: "", prod: "", outType: "", outPaqCat: "", isNew: false };
+    // OBJETO DE ESTADO UNIFICADO
+    let flow = { 
+        start: 0, 
+        sede: localStorage.getItem('p_sede') || "", // Recupera sede guardada
+        cat: "", 
+        prod: "", 
+        outType: "", 
+        outPaqCat: "", 
+        isNew: false 
+    };
 
     window.onload = () => {
         const urlP = new URLSearchParams(window.location.search);
-        const c = urlP.get('clave') || localStorage.getItem('p_clave');
-        if(c) fetch(`${SCRIPT_URL}?accion=validar&clave=${c}`).then(r=>r.json()).then(d=>{
-            if(d.status==="success") {
-                flow.sede = d.sede;
-                localStorage.setItem('p_clave', c);
-                document.getElementById('sedeLabel').innerText = "📍 " + d.sede;
-                lucide.createIcons();
-            }
-        });
+        const claveURL = urlP.get('clave');
+        const claveGuardada = localStorage.getItem('p_clave');
+        
+        const claveAUsar = claveURL || claveGuardada;
+
+        if (claveAUsar) {
+            validarAcceso(claveAUsar);
+        } else {
+            document.getElementById('loading').innerHTML = "❌ Acceso no detectado.<br>Escanea el QR de la sede.";
+        }
         renderGrids();
     };
+
+    function validarAcceso(c) {
+        fetch(`${SCRIPT_URL}?accion=validar&clave=${c}`)
+        .then(r => r.json())
+        .then(d => {
+            if(d.status === "success") {
+                // GUARDADO ROBUSTO
+                flow.sede = d.sede;
+                localStorage.setItem('p_clave', c);
+                localStorage.setItem('p_sede', d.sede);
+                
+                document.getElementById('sedeLabel').innerText = "📍 " + d.sede;
+                // Limpiar URL si tiene la clave
+                window.history.replaceState({}, '', window.location.pathname);
+                showView('viewMenu');
+            } else {
+                document.getElementById('loading').innerText = "❌ Clave inválida o Sede inactiva.";
+                localStorage.clear();
+            }
+        })
+        .catch(e => {
+            // Si hay error de red pero tenemos sede guardada, intentamos seguir
+            if(flow.sede) {
+                document.getElementById('sedeLabel').innerText = "📍 " + flow.sede;
+                showView('viewMenu');
+            } else {
+                alert("Error de conexión y no hay sede guardada.");
+            }
+        });
+    }
 
     function showView(id) {
         document.querySelectorAll('.container > div').forEach(v => v.classList.add('hidden'));
@@ -173,16 +213,17 @@
     }
 
     function startFlow(viewId) {
-        flow.start = Date.now(); // Inicia temporizador
+        flow.start = Date.now(); 
         showView('view' + viewId.charAt(0).toUpperCase() + viewId.slice(1));
     }
 
     function renderGrids() {
         const gIn = document.getElementById('gridIngresoCat');
         const gPaq = document.getElementById('gridPaqueteCat');
+        gIn.innerHTML = "";
+        gPaq.innerHTML = "";
         CATS.forEach(c => {
-            const html = `<div class="card" onclick="selCat('${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
-            gIn.innerHTML += html;
+            gIn.innerHTML += `<div class="card" onclick="selCat('${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
             gPaq.innerHTML += `<div class="card paq-cat" onclick="selPaqCat(this, '${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
         });
     }
@@ -207,12 +248,13 @@
 
     function checkReceptor() {
         const cc = document.getElementById('ccOut').value;
-        if(!cc) return;
+        if(!cc) return alert("Ingresa una CC");
+        
         fetch(`${SCRIPT_URL}?accion=buscar&cc=${cc}`).then(r=>r.json()).then(d=>{
             showView('viewSalidaTipo');
             if(d.status === "success") {
                 flow.isNew = false;
-                document.getElementById('receptorInfo').innerHTML = `<b>${d.nombre}</b><br>${d.rol}`;
+                document.getElementById('receptorInfo').innerHTML = `<b>Persona encontrada:</b><br>${d.nombre} (${d.rol})`;
                 document.getElementById('receptorInfo').classList.remove('hidden');
                 document.getElementById('boxNuevoRec').classList.add('hidden');
             } else {
@@ -223,7 +265,7 @@
         });
     }
 
-    function selOutType(el, type, icon) {
+    function selOutType(el, type) {
         document.querySelectorAll('.out-type').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         flow.outType = type;
@@ -237,14 +279,21 @@
     }
 
     function saveIngreso() {
+        if(!flow.sede) return alert("Error: No se detecta la Sede. Recarga la página.");
+        
         const duracion = Math.round((Date.now() - flow.start) / 1000);
         const pFinal = flow.prod === 'Otro' ? document.getElementById('customProd').value : flow.prod;
+        
         const d = {
-            tipo: 'ingreso', sede: flow.sede, categoria: flow.cat, 
-            producto: pFinal, cantidad: document.getElementById('cantIn').value,
-            observaciones: document.getElementById('obsIn').value, duracion: duracion
+            tipo: 'ingreso', 
+            sede: flow.sede, 
+            categoria: flow.cat, 
+            producto: pFinal, 
+            cantidad: document.getElementById('cantIn').value,
+            observaciones: document.getElementById('obsIn').value, 
+            duracion: duracion
         };
-        post(d);
+        postData(d);
     }
 
     function saveSalida() {
@@ -253,22 +302,48 @@
         
         const duracion = Math.round((Date.now() - flow.start) / 1000);
         const d = {
-            tipo: 'salida', sede: flow.sede, cc: document.getElementById('ccOut').value,
+            tipo: 'salida', 
+            sede: flow.sede, 
+            cc: document.getElementById('ccOut').value,
             categoria: flow.outType, 
             producto: flow.outType === 'Paquete' ? "Paquete de " + flow.outPaqCat : flow.outType,
-            cantidad: document.getElementById('cantOut').value, duracion: duracion
+            cantidad: document.getElementById('cantOut').value, 
+            duracion: duracion
         };
+
         if(flow.isNew) {
             d.nombre = document.getElementById('nomOut').value;
             d.rol = document.getElementById('rolOut').value;
+            if(!d.nombre) return alert("Escribe el nombre del receptor");
         }
-        post(d);
+        postData(d);
     }
 
-    function post(obj) {
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(obj) })
-        .then(() => { alert("✨ ¡Primicia Registrada!"); location.reload(); });
+    function postData(obj) {
+        // Bloquear botón para evitar doble clic (50 personas al tiempo)
+        const btn = document.querySelector('.btn-next:not(.hidden)');
+        if(btn) btn.disabled = true;
+
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', // Para evitar problemas de CORS en algunos móviles
+            body: JSON.stringify(obj) 
+        })
+        .then(() => { 
+            alert("✨ ¡Registro Guardado con éxito!"); 
+            location.reload(); 
+        })
+        .catch(e => {
+            alert("Error al guardar. Verifica tu conexión.");
+            if(btn) btn.disabled = false;
+        });
     }
+
+    function cerrarSesion() { 
+        localStorage.clear(); 
+        location.reload(); 
+    }
+</script>
 </script>
 </body>
 </html>
