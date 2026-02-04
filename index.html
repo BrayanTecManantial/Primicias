@@ -3,126 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sede - Control de Inventario</title>
+    <title>Primicias - Control de Sede</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f8fafc; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h2, h3 { text-align: center; color: #1e293b; margin-top: 0; }
+        :root {
+            --primary: #4f46e5; --secondary: #64748b;
+            --alimentos: #f59e0b; --ropa: #ec4899; --salud: #ef4444;
+            --higiene: #06b6d4; --utiles: #8b5cf6; --herramientas: #10b981;
+            --tech: #3b82f6; --otros: #78350f; --bg: #f1f5f9;
+        }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        .header { background: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
         .hidden { display: none; }
-        .info-badge { background: #e2e8f0; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 0.9em; }
-        label { display: block; margin: 12px 0 5px; font-weight: 600; color: #475569; }
-        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
-        .btn-blue { background: var(--primary); color: white; }
-        .btn-green { background: var(--success); color: white; }
-        .btn-red { background: var(--danger); color: white; }
-        .btn-gray { background: #64748b; color: white; }
-        .loader { text-align: center; padding: 20px; color: #64748b; }
-        .reg-nueva-persona { background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 10px; }
+
+        /* Estilo de Tarjetas de Categoría */
+        .grid-categories { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .card-cat { 
+            background: white; border-radius: 15px; padding: 20px; text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-bottom: 5px solid transparent;
+            transition: transform 0.2s; cursor: pointer;
+        }
+        .card-cat:active { transform: scale(0.95); }
+        .card-cat i { font-size: 30px; display: block; margin-bottom: 10px; }
+        .cat-alimentos { border-color: var(--alimentos); }
+        .cat-ropa { border-color: var(--ropa); }
+        .cat-salud { border-color: var(--salud); }
+        .cat-higiene { border-color: var(--higiene); }
+        .cat-utiles { border-color: var(--utiles); }
+        .cat-herramientas { border-color: var(--herramientas); }
+        .cat-tech { border-color: var(--tech); }
+        .cat-otros { border-color: var(--otros); }
+
+        /* Formularios y Botones */
+        .form-group { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; }
+        label { font-weight: 600; color: #334155; display: block; margin-bottom: 10px; }
+        select, input, textarea { 
+            width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; 
+            font-size: 16px; margin-bottom: 15px; box-sizing: border-box;
+        }
+        .btn { 
+            width: 100%; padding: 15px; border: none; border-radius: 10px; 
+            font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;
+        }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-success { background: var(--herramientas); color: white; }
+        
+        .badge-sede { background: #e0e7ff; color: #4338ca; padding: 5px 15px; border-radius: 20px; font-size: 12px; display: inline-block; }
     </style>
 </head>
 <body>
 
-<div class="container" id="app">
-    <div id="loading" class="loader">Cargando sistema...</div>
+<div class="header">
+    <div id="nombreSede" class="badge-sede">Cargando Sede...</div>
+    <h2 id="tituloPantalla" style="margin: 10px 0 0;">Gestión de Primicias</h2>
+</div>
 
-    <div id="loginScreen" class="hidden">
-        <h2>⚠️ Acceso no detectado</h2>
-        <p>Por favor, escanea el código QR de tu sede para ingresar.</p>
-    </div>
+<div class="container">
+    <div id="loading" style="text-align:center; margin-top:50px;">⏳ Validando acceso...</div>
 
     <div id="menuScreen" class="hidden">
-        <div id="infoSede" class="info-badge"></div>
-        <button class="btn-blue" onclick="navegar('ingresoScreen')">📥 REGISTRAR INGRESO</button>
-        <button class="btn-green" onclick="navegar('salidaScreen')">📤 REGISTRAR SALIDA</button>
-        <button class="btn-red" onclick="cerrarSesion()">Cerrar Sede</button>
+        <p style="text-align:center; color:#64748b;">¿Qué acción deseas realizar hoy?</p>
+        <button class="btn btn-main" onclick="irA('ingresoCat')">📥 Registrar Donación (Ingreso)</button>
+        <button class="btn btn-outline" onclick="irA('salidaPersona')">📤 Entrega / Salida</button>
+        <button class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; margin-top:30px;" onclick="cerrarSesion()">Cerrar Sesión</button>
     </div>
 
-    <div id="ingresoScreen" class="hidden">
-        <h3>Ingreso de Material</h3>
-        <label>Clasificación:</label>
-        <select id="catIn" onchange="cargarSubproductos('in')">
-            <option value="">-- Seleccionar --</option>
-            <option value="Alimentos">Alimentos</option>
-            <option value="Ropa y Textiles">Ropa y Textiles</option>
-            <option value="Medicamentos y Salud">Medicamentos y Salud</option>
-            <option value="Artículos de Higiene y Limpieza">Artículos de Higiene y Limpieza</option>
-            <option value="Útiles Escolares">Útiles Escolares</option>
-            <option value="Herramientas">Herramientas</option>
-            <option value="Tecnología y Electrónica">Tecnología y Electrónica</option>
-            <option value="Misceláneos/Otros">Misceláneos/Otros</option>
-        </select>
-
-        <label>Producto:</label>
-        <select id="prodIn"><option value="">-- Elige clasificación --</option></select>
-
-        <label>Cantidad:</label>
-        <input type="number" id="cantIn" value="1" min="1">
-
-        <label>Observaciones:</label>
-        <textarea id="obsIn" rows="2"></textarea>
-
-        <button class="btn-blue" onclick="enviarIngreso()">Guardar Entrada</button>
-        <button class="btn-gray" onclick="navegar('menuScreen')">Volver</button>
-    </div>
-
-    <div id="salidaScreen" class="hidden">
-        <h3>Salida / Entrega</h3>
-        <label>Cédula (CC):</label>
-        <input type="number" id="ccSearch" placeholder="Escribe la CC">
-        <button class="btn-blue" onclick="buscarPersona()">🔍 Buscar Persona</button>
-
-        <div id="zonaRegistroSalida" class="hidden">
-            <div id="datosPersonaNueva" class="reg-nueva-persona hidden">
-                <p style="margin:0 0 10px; color:var(--danger); font-weight:bold;">Persona no registrada. Completa:</p>
-                <label>Nombre Completo:</label>
-                <input type="text" id="nombreOut">
-                <label>Rol / Cargo:</label>
-                <select id="rolOut">
-                    <option value="Colaborador">Colaborador</option>
-                    <option value="Area">Area</option>
-                    <option value="Sup General">Sup General</option>
-                    <option value="Sup Auxiliar">Sup Auxiliar</option>
-                    <option value="Líder">Líder</option>
-                    <option value="Hermano mayor">Hermano mayor</option>
-                    <option value="Coordinador El Camino">Coordinador El Camino</option>
-                    <option value="Maestro">Maestro</option>
-                    <option value="Diaconado">Diaconado</option>
-                </select>
-            </div>
-
-            <div id="infoPersonaExistente" class="info-badge hidden" style="margin-top:15px; background:#f0fdf4;"></div>
-
-            <label>Clasificación a entregar:</label>
-            <select id="catOut" onchange="cargarSubproductos('out')">
-                <option value="">-- Seleccionar --</option>
-                <option value="Alimentos">Alimentos</option>
-                <option value="Ropa y Textiles">Ropa y Textiles</option>
-                <option value="Medicamentos y Salud">Medicamentos y Salud</option>
-                <option value="Artículos de Higiene y Limpieza">Artículos de Higiene y Limpieza</option>
-                <option value="Útiles Escolares">Útiles Escolares</option>
-                <option value="Herramientas">Herramientas</option>
-                <option value="Tecnología y Electrónica">Tecnología y Electrónica</option>
-                <option value="Misceláneos/Otros">Misceláneos/Otros</option>
-            </select>
-
-            <label>Producto:</label>
-            <select id="prodOut"><option value="">-- Elige clasificación --</option></select>
-
-            <label>Cantidad:</label>
-            <input type="number" id="cantOut" value="1">
-
-            <label>Estado del material:</label>
-            <select id="estadoOut">
-                <option value="Nuevo">Nuevo / Sellado</option>
-                <option value="Buen Estado">Usado (Buen Estado)</option>
-                <option value="Novedad">Con Novedad / Daño</option>
-            </select>
-
-            <button class="btn-green" onclick="enviarSalida()">Confirmar Salida</button>
+    <div id="ingresoCat" class="hidden">
+        <h3 style="text-align:center;">Selecciona la Clasificación</h3>
+        <div class="grid-categories">
+            <div class="card-cat cat-alimentos" onclick="seleccionarCat('Alimentos', '📥')"><i>🍎</i>Alimentos</div>
+            <div class="card-cat cat-ropa" onclick="seleccionarCat('Ropa y Textiles', '👕')"><i>👕</i>Ropa</div>
+            <div class="card-cat cat-salud" onclick="seleccionarCat('Medicamentos y Salud', '💊')"><i>💊</i>Salud</div>
+            <div class="card-cat cat-higiene" onclick="seleccionarCat('Artículos de Higiene', '🧼')"><i>🧼</i>Higiene</div>
+            <div class="card-cat cat-utiles" onclick="seleccionarCat('Útiles Escolares', '📚')"><i>📚</i>Útiles</div>
+            <div class="card-cat cat-herramientas" onclick="seleccionarCat('Herramientas', '🛠️')"><i>🛠️</i>Herramientas</div>
+            <div class="card-cat cat-tech" onclick="seleccionarCat('Tecnología', '💻')"><i>💻</i>Tecnología</div>
+            <div class="card-cat cat-otros" onclick="seleccionarCat('Misceláneos/Otros', '📦')"><i>📦</i>Otros</div>
         </div>
-        <button class="btn-gray" onclick="navegar('menuScreen')">Volver</button>
+        <button class="btn btn-outline" style="margin-top:20px;" onclick="irA('menuScreen')">Volver</button>
+    </div>
+
+    <div id="ingresoDetalle" class="hidden">
+        <div class="form-group">
+            <h3 id="catElegida" style="margin-top:0;"></h3>
+            <label>Producto:</label>
+            <select id="prodIn"></select>
+            <label>Cantidad:</label>
+            <input type="number" id="cantIn" value="1">
+            <label>Observaciones:</label>
+            <textarea id="obsIn" rows="2" placeholder="Ej: Vencimiento, estado..."></textarea>
+            <button class="btn btn-main" onclick="enviarIngreso()">Confirmar Primicia</button>
+            <button class="btn btn-outline" onclick="irA('ingresoCat')">Cambiar Categoría</button>
+        </div>
+    </div>
+
+    <div id="salidaPersona" class="hidden">
+        <div class="form-group">
+            <h3>Identificación del Receptor</h3>
+            <label>Número de Cédula:</label>
+            <input type="number" id="ccOut" placeholder="Ingrese CC">
+            <button class="btn btn-main" onclick="buscarCC()">Verificar Datos</button>
+            
+            <div id="extraSalida" class="hidden">
+                <div id="infoExistente" style="background:#f0fdf4; padding:10px; border-radius:10px; margin-bottom:15px; font-size:14px;"></div>
+                <div id="formNuevo" class="hidden">
+                    <label>Nombre del Receptor:</label>
+                    <input type="text" id="nombreOut">
+                    <label>Cargo / Rol:</label>
+                    <select id="rolOut">
+                        <option value="Colaborador">Colaborador</option>
+                        <option value="Area">Area</option>
+                        <option value="Sup General">Sup General</option>
+                        <option value="Sup Auxiliar">Sup Auxiliar</option>
+                        <option value="Líder">Líder</option>
+                        <option value="Hermano mayor">Hermano mayor</option>
+                        <option value="Coordinador El Camino">Coordinador El Camino</option>
+                        <option value="Maestro">Maestro</option>
+                        <option value="Diaconado">Diaconado</option>
+                    </select>
+                </div>
+                <label>¿Qué se entrega?</label>
+                <select id="catOut" onchange="actualizarProdsSalida()">
+                    <option value="">-- Clasificación --</option>
+                    <option value="Alimentos">Alimentos</option>
+                    <option value="Ropa y Textiles">Ropa y Textiles</option>
+                    <option value="Medicamentos y Salud">Medicamentos y Salud</option>
+                    <option value="Artículos de Higiene">Higiene</option>
+                    <option value="Útiles Escolares">Útiles</option>
+                    <option value="Herramientas">Herramientas</option>
+                    <option value="Tecnología">Tecnología</option>
+                    <option value="Misceláneos/Otros">Otros</option>
+                </select>
+                <select id="prodOut"><option value="">-- Elegir producto --</option></select>
+                <label>Cantidad:</label>
+                <input type="number" id="cantOut" value="1">
+                <button class="btn btn-success" onclick="enviarSalida()">Registrar Entrega</button>
+            </div>
+            <button class="btn btn-outline" onclick="irA('menuScreen')">Cancelar</button>
+        </div>
     </div>
 </div>
 
@@ -130,123 +150,115 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxayHseCRZ2NYM2mcU5zXwZaucSOfz4gDnBo9NPSJXVZKNRpZxw22aT1rogXx4t_f_V/exec"; 
 
     const CATALOGO = {
-        "Alimentos": ["Comida no perecedera (enlatados, arroz...)", "Bebidas (agua, jugos...)", "Productos perecederos (pan, frutas...)"],
-        "Ropa y Textiles": ["Ropa adultos/jóvenes", "Ropa niños/bebés", "Mantas, cobijas y sábanas", "Calzado y accesorios"],
-        "Medicamentos y Salud": ["Medicamentos venta libre", "Insumos médicos (gasas, alcohol...)"],
-        "Artículos de Higiene y Limpieza": ["Higiene personal", "Limpieza hogar"],
-        "Útiles Escolares": ["Mochilas y estuches", "Cuadernos y lápices", "Libros", "Material de arte"],
-        "Herramientas": ["Herramientas manuales", "Herramientas eléctricas", "Materiales construcción", "Repuestos/Clavos"],
-        "Tecnología y Electrónica": ["Teléfonos/Tablets/Laptops", "Cargadores/Cables", "Pequeños electrodomésticos"],
-        "Misceláneos/Otros": ["Accesorios (perfumes, cremas)", "Juguetes/Adornos/Varios"]
+        "Alimentos": ["Comida no perecedera", "Bebidas", "Productos perecederos"],
+        "Ropa y Textiles": ["Ropa adultos/jóvenes", "Ropa niños/bebés", "Mantas y cobijas", "Calzado"],
+        "Medicamentos y Salud": ["Medicamentos venta libre", "Insumos médicos"],
+        "Artículos de Higiene": ["Higiene personal", "Limpieza hogar"],
+        "Útiles Escolares": ["Mochilas", "Cuadernos/Lápices", "Libros", "Material arte"],
+        "Herramientas": ["Manuales", "Eléctricas", "Construcción", "Repuestos"],
+        "Tecnología": ["Teléfonos/Tablets", "Cables/Cargadores", "Electrodomésticos"],
+        "Misceláneos/Otros": ["Perfumería/Cremas", "Juguetes", "Varios"]
     };
 
-    let datosSede = null;
-    let personaEncontrada = false;
+    let sedeData = null;
+    let catSeleccionada = "";
+    let esPersonaNueva = false;
 
     window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        const clave = params.get('clave');
-        const local = localStorage.getItem('sedeData');
-
-        if (clave) validar(clave);
-        else if (local) { datosSede = JSON.parse(local); iniciar(); }
-        else mostrar('loginScreen');
+        const urlP = new URLSearchParams(window.location.search);
+        const clave = urlP.get('clave');
+        const storage = localStorage.getItem('primicias_sede');
+        if(clave) validar(clave);
+        else if(storage) { sedeData = JSON.parse(storage); iniciar(); }
+        else { document.getElementById('loading').innerText = "❌ No hay sede detectada. Escanea el QR."; }
     };
 
     function validar(c) {
         fetch(`${SCRIPT_URL}?accion=validar&clave=${c}`)
-            .then(r => r.json()).then(d => {
-                if(d.status === "success") {
-                    datosSede = d;
-                    localStorage.setItem('sedeData', JSON.stringify(d));
-                    window.history.replaceState({}, '', window.location.pathname);
-                    iniciar();
-                } else { mostrar('loginScreen'); }
-            });
+        .then(r => r.json()).then(d => {
+            if(d.status === "success") {
+                sedeData = d;
+                localStorage.setItem('primicias_sede', JSON.stringify(d));
+                window.history.replaceState({}, '', window.location.pathname);
+                iniciar();
+            }
+        });
     }
 
     function iniciar() {
-        document.getElementById('infoSede').innerText = `📍 ${datosSede.sede}`;
-        mostrar('menuScreen');
+        document.getElementById('nombreSede').innerText = `📍 ${sedeData.sede}`;
+        irA('menuScreen');
     }
 
-    function mostrar(id) {
-        ['loading','loginScreen','menuScreen','ingresoScreen','salidaScreen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+    function irA(id) {
+        ['menuScreen', 'ingresoCat', 'ingresoDetalle', 'salidaPersona', 'loading'].forEach(s => document.getElementById(s).classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function navegar(id) { mostrar(id); }
+    function seleccionarCat(cat, emoji) {
+        catSeleccionada = cat;
+        document.getElementById('catElegida').innerText = `${emoji} ${cat}`;
+        const pSel = document.getElementById('prodIn');
+        pSel.innerHTML = "";
+        CATALOGO[cat].forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
+        irA('ingresoDetalle');
+    }
 
-    function cargarSubproductos(tipo) {
-        const cat = document.getElementById(tipo === 'in' ? 'catIn' : 'catOut').value;
-        const pSel = document.getElementById(tipo === 'in' ? 'prodIn' : 'prodOut');
-        pSel.innerHTML = '<option value="">-- Selecciona Producto --</option>';
+    function actualizarProdsSalida() {
+        const cat = document.getElementById('catOut').value;
+        const pSel = document.getElementById('prodOut');
+        pSel.innerHTML = "";
         if(CATALOGO[cat]) CATALOGO[cat].forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
     }
 
-    function buscarPersona() {
-        const cc = document.getElementById('ccSearch').value;
-        if(!cc) return alert("Escribe una CC");
-        
+    function buscarCC() {
+        const cc = document.getElementById('ccOut').value;
         fetch(`${SCRIPT_URL}?accion=buscar&cc=${cc}`)
-            .then(r => r.json()).then(d => {
-                document.getElementById('zonaRegistroSalida').classList.remove('hidden');
-                if(d.status === "success") {
-                    personaEncontrada = true;
-                    document.getElementById('datosPersonaNueva').classList.add('hidden');
-                    const info = document.getElementById('infoPersonaExistente');
-                    info.classList.remove('hidden');
-                    info.innerHTML = `👤 ${d.nombre}<br><small>Rol: ${d.rol} | Último: ${d.ultimoProducto}</small>`;
-                } else {
-                    personaEncontrada = false;
-                    document.getElementById('datosPersonaNueva').classList.remove('hidden');
-                    document.getElementById('infoPersonaExistente').classList.add('hidden');
-                }
-            });
+        .then(r => r.json()).then(d => {
+            document.getElementById('extraSalida').classList.remove('hidden');
+            if(d.status === "success") {
+                esPersonaNueva = false;
+                document.getElementById('formNuevo').classList.add('hidden');
+                document.getElementById('infoExistente').classList.remove('hidden');
+                document.getElementById('infoExistente').innerHTML = `<b>${d.nombre}</b> (${d.rol})<br>Última entrega: ${d.ultimoProducto}`;
+            } else {
+                esPersonaNueva = true;
+                document.getElementById('formNuevo').classList.remove('hidden');
+                document.getElementById('infoExistente').classList.add('hidden');
+            }
+        });
     }
 
     function enviarIngreso() {
-        const btn = event.target; btn.disabled = true;
-        const data = {
-            tipo: 'ingreso',
-            sede: datosSede.sede,
-            categoria: document.getElementById('catIn').value,
+        const d = {
+            tipo: 'ingreso', sede: sedeData.sede,
+            categoria: catSeleccionada,
             producto: document.getElementById('prodIn').value,
             cantidad: document.getElementById('cantIn').value,
             observaciones: document.getElementById('obsIn').value
         };
-        if(!data.producto) return (alert("Elige producto"), btn.disabled=false);
-        postData(data);
+        save(d);
     }
 
     function enviarSalida() {
-        const btn = event.target; btn.disabled = true;
-        const data = {
-            tipo: 'salida',
-            sede: datosSede.sede,
-            cc: document.getElementById('ccSearch').value,
+        const d = {
+            tipo: 'salida', sede: sedeData.sede,
+            cc: document.getElementById('ccOut').value,
             categoria: document.getElementById('catOut').value,
             producto: document.getElementById('prodOut').value,
             cantidad: document.getElementById('cantOut').value,
-            estado: document.getElementById('estadoOut').value,
-            observaciones: ""
+            estado: "Entregado", observaciones: ""
         };
-
-        if(!personaEncontrada) {
-            data.nombre = document.getElementById('nombreOut').value;
-            data.rol = document.getElementById('rolOut').value;
-            if(!data.nombre) return (alert("Escribe el nombre"), btn.disabled=false);
+        if(esPersonaNueva) {
+            d.nombre = document.getElementById('nombreOut').value;
+            d.rol = document.getElementById('rolOut').value;
         }
-
-        if(!data.producto) return (alert("Elige producto"), btn.disabled=false);
-        postData(data);
+        save(d);
     }
 
-    function postData(d) {
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(d) })
-            .then(r => r.json()).then(res => {
-                if(res.status === "success") { alert("✅ Guardado"); location.reload(); }
-            }).catch(e => alert("Error al guardar"));
+    function save(obj) {
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(obj) })
+        .then(r => r.json()).then(res => { if(res.status === "success") { alert("✅ Guardado"); location.reload(); } });
     }
 
     function cerrarSesion() { localStorage.clear(); location.reload(); }
