@@ -9,31 +9,19 @@
     <style>
         :root { --primary: #6366f1; --primary-dark: #4f46e5; --bg: #f3f4f6; --text: #1f2937; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
-        .header { background: white; padding: 20px; text-align: center; border-bottom: 1px solid #e5e7eb; sticky: top; }
+        .header { background: white; padding: 20px; text-align: center; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 99; }
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
         .hidden { display: none; }
-        
-        /* Grid de Tarjetas */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .card { 
-            background: white; border-radius: 16px; padding: 20px; text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid transparent;
-            transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center;
-        }
+        .card { background: white; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid transparent; transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         .card:active { transform: scale(0.95); background: #f9fafb; }
         .card.active { border-color: var(--primary); background: #eef2ff; }
         .card i { margin-bottom: 10px; color: var(--primary); }
         .card span { font-size: 13px; font-weight: 600; }
-
-        /* Inputs y Botones */
         .box { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-top: 15px; }
-        input, select, textarea { 
-            width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 12px; 
-            font-size: 16px; margin-bottom: 15px; box-sizing: border-box;
-        }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 12px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; }
         .btn-next { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; }
         .btn-back { background: transparent; color: #6b7280; border: none; padding: 10px; width: 100%; margin-top: 10px; cursor: pointer; font-size: 14px; }
-        
         .badge { background: #e0e7ff; color: #4338ca; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; }
         .timer-dot { display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
@@ -47,18 +35,21 @@
 </div>
 
 <div class="container">
-    <div id="viewMenu">
+    <div id="viewLoading" style="text-align: center; padding: 40px;">
+        <h3 id="loadingText">⏳ Verificando acceso...</h3>
+    </div>
+
+    <div id="viewMenu" class="hidden">
         <h2 style="text-align:center; margin-bottom:25px;">Gestión de Primicias</h2>
         <div class="grid">
             <div class="card" onclick="startFlow('ingresoCat')" style="grid-column: span 2; padding: 40px;">
-                <i data-lucide="package-plus" size="48"></i>
-                <span>RECIBIR PRIMICIA</span>
+                <i data-lucide="package-plus" size="48"></i><span>RECIBIR PRIMICIA</span>
             </div>
             <div class="card" onclick="startFlow('salidaCC')" style="grid-column: span 2; padding: 40px;">
-                <i data-lucide="hand-helping" size="48"></i>
-                <span>ENTREGAR BENEFICIARIOS</span>
+                <i data-lucide="hand-helping" size="48"></i><span>ENTREGAR BENEFICIARIOS</span>
             </div>
         </div>
+        <button class="btn-back" onclick="cerrarSesion()" style="color:#ef4444;">Cerrar Sede</button>
     </div>
 
     <div id="viewIngresoCat" class="hidden">
@@ -70,18 +61,17 @@
     <div id="viewIngresoProd" class="hidden">
         <h3 id="labelCatSel"></h3>
         <div id="gridIngresoProd" class="grid"></div>
-        <button class="btn-back" onclick="showView('viewIngresoCat')">Cambiar Clasificación</button>
+        <button class="btn-back" onclick="showView('viewIngresoCat')">Atrás</button>
     </div>
 
     <div id="viewIngresoFinal" class="hidden">
         <div class="box">
             <h4 id="labelProdSel" style="margin-top:0; color:var(--primary);"></h4>
-            <input type="text" id="customProd" class="hidden" placeholder="Nombre del producto específico">
+            <input type="text" id="customProd" class="hidden" placeholder="Especificar producto">
             <label style="font-size:12px; font-weight:bold;">Cantidad</label>
             <input type="number" id="cantIn" value="1">
-            <label style="font-size:12px; font-weight:bold;">Observación</label>
-            <textarea id="obsIn" placeholder="Estado, vencimiento, etc."></textarea>
-            <button class="btn-next" onclick="saveIngreso()">Confirmar y Guardar</button>
+            <textarea id="obsIn" placeholder="Observaciones..."></textarea>
+            <button id="btnSaveIn" class="btn-next" onclick="saveIngreso()">Confirmar y Guardar</button>
         </div>
     </div>
 
@@ -109,25 +99,24 @@
         </div>
         <h3>¿Qué vas a entregar?</h3>
         <div class="grid">
-            <div class="card out-type" onclick="selOutType(this, 'Mercado', 'shopping-basket')"><i data-lucide="shopping-basket"></i><span>MERCADO</span></div>
-            <div class="card out-type" onclick="selOutType(this, 'Refrigerio', 'coffee')"><i data-lucide="coffee"></i><span>REFRIGERIO</span></div>
-            <div class="card out-type" onclick="selOutType(this, 'Paquete', 'package')"><i data-lucide="package"></i><span>PAQUETE</span></div>
+            <div class="card out-type" onclick="selOutType(this, 'Mercado')"><i data-lucide="shopping-basket"></i><span>MERCADO</span></div>
+            <div class="card out-type" onclick="selOutType(this, 'Refrigerio')"><i data-lucide="coffee"></i><span>REFRIGERIO</span></div>
+            <div class="card out-type" onclick="selOutType(this, 'Paquete')"><i data-lucide="package"></i><span>PAQUETE</span></div>
         </div>
         <div id="boxPaqueteCat" class="hidden">
-            <p style="font-size:12px; font-weight:bold; margin-top:15px;">Selecciona Clasificación del Paquete:</p>
+            <p style="font-size:12px; font-weight:bold; margin-top:15px;">Clasificación del Paquete:</p>
             <div id="gridPaqueteCat" class="grid"></div>
         </div>
         <div class="box">
-            <input type="number" id="cantOut" value="1" placeholder="Cantidad">
-            <button class="btn-next" onclick="saveSalida()">Finalizar Entrega</button>
+            <input type="number" id="cantOut" value="1">
+            <button id="btnSaveOut" class="btn-next" onclick="saveSalida()">Finalizar Entrega</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZq1jQJjZT9KsS-dYTVGS6If149aZTmCIaRBztlAmmBEkixZ2Ea1mfr3zu0a3gZ7YU/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRdioggyNnWR0cJSs6MLscehkD2votPCYvfvqJpaVeZsOgWyt5oQmDmHT8NrxlmrvM/exec"; // RECUERDA CAMBIAR ESTO
     
-    // Configuración de Categorías e Iconos
     const CATS = [
         {id: "Alimentos", icon: "apple", label: "Alimentos"},
         {id: "Ropa", icon: "shirt", label: "Ropa"},
@@ -150,60 +139,47 @@
         "Otros": ["Juguetes", "Muebles", "Decoración", "Otro"]
     };
 
-    // OBJETO DE ESTADO UNIFICADO
-    let flow = { 
-        start: 0, 
-        sede: localStorage.getItem('p_sede') || "", // Recupera sede guardada
-        cat: "", 
-        prod: "", 
-        outType: "", 
-        outPaqCat: "", 
-        isNew: false 
-    };
+    let flow = { start: 0, sede: localStorage.getItem('p_sede') || "", cat: "", prod: "", outType: "", outPaqCat: "", isNew: false };
 
     window.onload = () => {
         const urlP = new URLSearchParams(window.location.search);
-        const claveURL = urlP.get('clave');
-        const claveGuardada = localStorage.getItem('p_clave');
-        
-        const claveAUsar = claveURL || claveGuardada;
-
-        if (claveAUsar) {
-            validarAcceso(claveAUsar);
+        const clave = urlP.get('clave') || localStorage.getItem('p_clave');
+        if (clave) {
+            validarAcceso(clave);
         } else {
-            document.getElementById('loading').innerHTML = "❌ Acceso no detectado.<br>Escanea el QR de la sede.";
+            document.getElementById('loadingText').innerHTML = "❌ Escanea el QR de la sede.";
         }
         renderGrids();
     };
 
     function validarAcceso(c) {
         fetch(`${SCRIPT_URL}?accion=validar&clave=${c}`)
-        .then(r => r.json())
-        .then(d => {
+        .then(r => r.json()).then(d => {
             if(d.status === "success") {
-                // GUARDADO ROBUSTO
                 flow.sede = d.sede;
                 localStorage.setItem('p_clave', c);
                 localStorage.setItem('p_sede', d.sede);
-                
                 document.getElementById('sedeLabel').innerText = "📍 " + d.sede;
-                // Limpiar URL si tiene la clave
-                window.history.replaceState({}, '', window.location.pathname);
                 showView('viewMenu');
             } else {
-                document.getElementById('loading').innerText = "❌ Clave inválida o Sede inactiva.";
-                localStorage.clear();
+                document.getElementById('loadingText').innerText = "❌ Clave inválida.";
             }
-        })
-        .catch(e => {
-            // Si hay error de red pero tenemos sede guardada, intentamos seguir
-            if(flow.sede) {
+        }).catch(() => {
+            if(flow.sede) { // Si falló internet pero tenemos la sede guardada
                 document.getElementById('sedeLabel').innerText = "📍 " + flow.sede;
                 showView('viewMenu');
-            } else {
-                alert("Error de conexión y no hay sede guardada.");
             }
         });
+    }
+
+    function renderGrids() {
+        const gIn = document.getElementById('gridIngresoCat');
+        const gPaq = document.getElementById('gridPaqueteCat');
+        CATS.forEach(c => {
+            gIn.innerHTML += `<div class="card" onclick="selCat('${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
+            gPaq.innerHTML += `<div class="card paq-cat" onclick="selPaqCat(this, '${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
+        });
+        lucide.createIcons();
     }
 
     function showView(id) {
@@ -213,19 +189,8 @@
     }
 
     function startFlow(viewId) {
-        flow.start = Date.now(); 
+        flow.start = Date.now();
         showView('view' + viewId.charAt(0).toUpperCase() + viewId.slice(1));
-    }
-
-    function renderGrids() {
-        const gIn = document.getElementById('gridIngresoCat');
-        const gPaq = document.getElementById('gridPaqueteCat');
-        gIn.innerHTML = "";
-        gPaq.innerHTML = "";
-        CATS.forEach(c => {
-            gIn.innerHTML += `<div class="card" onclick="selCat('${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
-            gPaq.innerHTML += `<div class="card paq-cat" onclick="selPaqCat(this, '${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
-        });
     }
 
     function selCat(id) {
@@ -248,13 +213,12 @@
 
     function checkReceptor() {
         const cc = document.getElementById('ccOut').value;
-        if(!cc) return alert("Ingresa una CC");
-        
+        if(!cc) return alert("Ingresa CC");
         fetch(`${SCRIPT_URL}?accion=buscar&cc=${cc}`).then(r=>r.json()).then(d=>{
             showView('viewSalidaTipo');
             if(d.status === "success") {
                 flow.isNew = false;
-                document.getElementById('receptorInfo').innerHTML = `<b>Persona encontrada:</b><br>${d.nombre} (${d.rol})`;
+                document.getElementById('receptorInfo').innerHTML = `<b>Encontrado:</b><br>${d.nombre} (${d.rol})`;
                 document.getElementById('receptorInfo').classList.remove('hidden');
                 document.getElementById('boxNuevoRec').classList.add('hidden');
             } else {
@@ -279,71 +243,47 @@
     }
 
     function saveIngreso() {
-        if(!flow.sede) return alert("Error: No se detecta la Sede. Recarga la página.");
+        if(!flow.sede) return alert("No hay sede");
+        const btn = document.getElementById('btnSaveIn');
+        btn.disabled = true; btn.innerText = "Guardando...";
         
         const duracion = Math.round((Date.now() - flow.start) / 1000);
         const pFinal = flow.prod === 'Otro' ? document.getElementById('customProd').value : flow.prod;
         
         const d = {
-            tipo: 'ingreso', 
-            sede: flow.sede, 
-            categoria: flow.cat, 
-            producto: pFinal, 
-            cantidad: document.getElementById('cantIn').value,
-            observaciones: document.getElementById('obsIn').value, 
-            duracion: duracion
+            tipo: 'ingreso', sede: flow.sede, categoria: flow.cat, 
+            producto: pFinal, cantidad: document.getElementById('cantIn').value,
+            observaciones: document.getElementById('obsIn').value, duracion: duracion
         };
-        postData(d);
+        post(d);
     }
 
     function saveSalida() {
-        if(!flow.outType) return alert("Selecciona tipo de entrega");
-        if(flow.outType === 'Paquete' && !flow.outPaqCat) return alert("Selecciona clasificación del paquete");
+        if(!flow.outType) return alert("Elige qué entregas");
+        const btn = document.getElementById('btnSaveOut');
+        btn.disabled = true;
         
         const duracion = Math.round((Date.now() - flow.start) / 1000);
         const d = {
-            tipo: 'salida', 
-            sede: flow.sede, 
-            cc: document.getElementById('ccOut').value,
+            tipo: 'salida', sede: flow.sede, cc: document.getElementById('ccOut').value,
             categoria: flow.outType, 
             producto: flow.outType === 'Paquete' ? "Paquete de " + flow.outPaqCat : flow.outType,
-            cantidad: document.getElementById('cantOut').value, 
-            duracion: duracion
+            cantidad: document.getElementById('cantOut').value, duracion: duracion
         };
-
         if(flow.isNew) {
             d.nombre = document.getElementById('nomOut').value;
             d.rol = document.getElementById('rolOut').value;
-            if(!d.nombre) return alert("Escribe el nombre del receptor");
         }
-        postData(d);
+        post(d);
     }
 
-    function postData(obj) {
-        // Bloquear botón para evitar doble clic (50 personas al tiempo)
-        const btn = document.querySelector('.btn-next:not(.hidden)');
-        if(btn) btn.disabled = true;
-
-        fetch(SCRIPT_URL, { 
-            method: 'POST', 
-            mode: 'no-cors', // Para evitar problemas de CORS en algunos móviles
-            body: JSON.stringify(obj) 
-        })
-        .then(() => { 
-            alert("✨ ¡Registro Guardado con éxito!"); 
-            location.reload(); 
-        })
-        .catch(e => {
-            alert("Error al guardar. Verifica tu conexión.");
-            if(btn) btn.disabled = false;
-        });
+    function post(obj) {
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(obj) })
+        .then(() => { alert("✅ ¡Registro Guardado!"); location.reload(); })
+        .catch(() => { alert("Error de red"); location.reload(); });
     }
 
-    function cerrarSesion() { 
-        localStorage.clear(); 
-        location.reload(); 
-    }
-</script>
+    function cerrarSesion() { localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
