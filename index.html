@@ -179,23 +179,84 @@
         lucide.createIcons();
     }
 
-    function saveIngreso() {
-        const data = { accion: "ingreso", sede: flow.sede, categoria: flow.cat, producto: flow.prod, cantidad: document.getElementById('cantIn').value, obs: document.getElementById('obsIn').value };
-        send(data);
-    }
+    // REEMPLAZA SOLO LA FUNCIÓN SEND Y SAVE EN TU SCRIPT DE GITHUB
 
-    function saveSalida() {
-        const mercado = flow.salidaArticulos.includes('MERCADO') ? 'SÍ' : 'NO';
-        const otros = flow.salidaArticulos.filter(i => i !== 'MERCADO').join(', ');
-        const data = { accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value, nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value, mercado: mercado, articulos: otros };
-        send(data);
-    }
+function saveIngreso() {
+    const data = { 
+        accion: "ingreso", 
+        sede: flow.sede, 
+        categoria: flow.cat, 
+        producto: flow.prod, 
+        cantidad: document.getElementById('cantIn').value, 
+        obs: document.getElementById('obsIn').value 
+    };
+    send(data);
+}
 
-    function send(data) {
-        document.getElementById('loader').style.display = 'flex';
-        fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
-        .then(() => { setTimeout(() => { alert("Registro Exitoso"); location.reload(); }, 500); });
+function saveSalida() {
+    if(!document.getElementById('nomOut').value || !document.getElementById('ccOut').value) {
+        alert("Por favor completa Nombre y Cédula");
+        return;
     }
+    const mercado = flow.salidaArticulos.includes('MERCADO') ? 'SÍ' : 'NO';
+    const otros = flow.salidaArticulos.filter(i => i !== 'MERCADO').join(', ');
+    
+    const data = { 
+        accion: "salida", 
+        sede: flow.sede, 
+        cc: document.getElementById('ccOut').value, 
+        nombre: document.getElementById('nomOut').value, 
+        cargo: document.getElementById('cargoOut').value, 
+        mercado: mercado, 
+        articulos: otros 
+    };
+    send(data);
+}
+
+function send(data) {
+    const loader = document.getElementById('loader');
+    const loaderText = loader.querySelector('p');
+    
+    // 1. Mostrar estado de carga
+    loader.style.display = 'flex';
+    loaderText.innerText = "Enviando a la nube...";
+    loaderText.style.color = "#0f172a";
+
+    fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+    .then(() => {
+        // 2. Mostrar éxito visualmente sin ventana emergente
+        loader.querySelector('.spinner').style.display = 'none'; // Escondemos el círculo
+        loaderText.innerHTML = "✅ <br> ¡Guardado con éxito!";
+        loaderText.style.color = "#10b981";
+        loaderText.style.fontSize = "20px";
+
+        // 3. Esperar 2 segundos y resetear la App al menú inicial
+        setTimeout(() => {
+            resetFormularios();
+            showView('viewMain');
+            
+            // Restaurar el loader para la próxima vez
+            loader.style.display = 'none';
+            loader.querySelector('.spinner').style.display = 'block';
+            loaderText.style.fontSize = "16px";
+        }, 2000);
+    })
+    .catch(err => {
+        alert("Error de conexión. Intente de nuevo.");
+        loader.style.display = 'none';
+    });
+}
+
+function resetFormularios() {
+    // Limpiar campos de texto
+    document.querySelectorAll('input, textarea, select').forEach(el => el.value = (el.type === 'number' ? '1' : ''));
+    // Limpiar selección de salida
+    flow.salidaArticulos = [];
+    document.querySelectorAll('.out-item').forEach(el => el.classList.remove('selected'));
+    // Resetear variables de flujo
+    flow.cat = "";
+    flow.prod = "";
+}
 </script>
 </body>
 </html>
