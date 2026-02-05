@@ -3,149 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primicias Pro</title>
+    <title>Sistema Primicias V4</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6366f1; --bg: #f3f4f6; --text: #1f2937; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
-        .header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 99; }
-        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        :root { --primary: #4f46e5; --secondary: #10b981; --bg: #f8fafc; --card: #ffffff; }
+        body { font-family: 'Segoe UI', system-ui; background: var(--bg); margin: 0; padding: 0; }
+        .header { background: white; padding: 15px; text-align: center; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 500px; margin: auto; padding: 15px; }
         .hidden { display: none; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .card { background: white; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-        .card.active { border-color: var(--primary); background: #eef2ff; }
-        .card i { margin-bottom: 10px; color: var(--primary); }
-        .box { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-top: 15px; }
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 12px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; }
-        .btn-next { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        .badge { background: #e0e7ff; color: #4338ca; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; }
-        .timer-dot { display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        
+        /* Botones de Categoría Estilo App */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-card { 
+            background: var(--card); border: 1px solid #e2e8f0; border-radius: 16px; 
+            padding: 20px; text-align: center; cursor: pointer; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .btn-card:active { transform: scale(0.95); background: #f1f5f9; }
+        .btn-card i { color: var(--primary); margin-bottom: 8px; }
+        .btn-card span { font-weight: 600; font-size: 13px; color: #334155; }
+
+        /* Formulario */
+        .form-group { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px #0001; margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        
+        .btn-main { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .btn-back { background: #64748b; color: white; border: none; width: 100%; padding: 10px; border-radius: 12px; margin-top: 10px; cursor: pointer; }
+        
+        /* Toggle Mercado */
+        .toggle-container { display: flex; align-items: center; justify-content: space-between; background: #ecfdf5; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #10b981; }
+        
+        .badge-sede { background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <span id="sedeLabel" class="badge">Validando...</span>
-    <div style="margin-top:5px; font-size:11px; color:#6b7280;"><span class="timer-dot"></span>Sistema Activo</div>
+    <div id="sedeDisplay"><span class="badge-sede">Cargando Sede...</span></div>
 </div>
 
 <div class="container">
-    <div id="viewMenu" class="hidden">
-        <h2 style="text-align:center;">Gestión Primicias</h2>
-        <div class="grid">
-            <div class="card" onclick="startFlow('ingresoCat')" style="grid-column: span 2; padding: 30px;">
-                <i data-lucide="package-plus" size="40"></i><span>RECIBIR</span>
+    <div id="viewMain">
+        <h2 style="text-align: center; color: #1e293b;">¿Qué deseas hacer?</h2>
+        <div class="grid-menu">
+            <div class="btn-card" onclick="showView('viewIngreso')">
+                <i data-lucide="download" size="32"></i><span>RECIBIR</span>
             </div>
-            <div class="card" onclick="startFlow('salidaCC')" style="grid-column: span 2; padding: 30px;">
-                <i data-lucide="hand-helping" size="40"></i><span>ENTREGAR</span>
+            <div class="btn-card" onclick="showView('viewSalida')">
+                <i data-lucide="upload" size="32"></i><span>ENTREGAR</span>
             </div>
         </div>
     </div>
 
-    <div id="viewIngresoCat" class="hidden">
-        <h3>Clasificación</h3>
-        <div id="gridIngresoCat" class="grid"></div>
-        <button class="btn-next" style="background:#9ca3af; margin-top:15px;" onclick="showView('viewMenu')">Volver</button>
+    <div id="viewIngreso" class="hidden">
+        <h3>Selecciona Categoría</h3>
+        <div id="catGrid" class="grid-menu"></div>
+        <button class="btn-back" onclick="showView('viewMain')">Volver</button>
     </div>
 
-    <div id="viewIngresoProd" class="hidden">
-        <h3 id="labelCatSel"></h3>
-        <div id="gridIngresoProd" class="grid"></div>
+    <div id="viewSubCat" class="hidden">
+        <h3 id="subCatTitle"></h3>
+        <div id="subCatGrid" class="grid-menu"></div>
+        <button class="btn-back" onclick="showView('viewIngreso')">Atrás</button>
     </div>
 
-    <div id="viewIngresoFinal" class="hidden">
-        <div class="box">
-            <h4 id="labelProdSel" style="color:var(--primary);"></h4>
-            <input type="number" id="cantIn" placeholder="Cantidad" value="1">
-            <textarea id="obsIn" placeholder="Observaciones (Estado, etc.)"></textarea>
-            <button id="btnSaveIn" class="btn-next" onclick="saveIngreso()">Guardar Registro</button>
+    <div id="viewFinalIngreso" class="hidden">
+        <div class="form-group">
+            <h4 id="prodSelTitle" style="color: var(--primary);"></h4>
+            <input type="text" id="customProd" class="hidden" placeholder="¿Cuál artículo?">
+            <label>Cantidad</label>
+            <input type="number" id="cantIn" value="1">
+            <label>Observaciones</label>
+            <textarea id="obsIn" rows="3" placeholder="Ej: Buen estado, vence pronto..."></textarea>
+            <button class="btn-main" onclick="saveIngreso()">GUARDAR ENTRADA</button>
         </div>
     </div>
 
-    <div id="viewSalidaCC" class="hidden">
-        <div class="box">
-            <h3>Datos del Beneficiario</h3>
-            <input type="number" id="ccOut" placeholder="Número de Cédula">
-            <input type="text" id="nomOut" placeholder="Nombre Completo">
-            <select id="rolOut">
+    <div id="viewSalida" class="hidden">
+        <div class="form-group">
+            <h3>Registro de Entrega</h3>
+            <label>Cédula</label>
+            <input type="number" id="ccOut" placeholder="Sin puntos ni comas">
+            <label>Nombre Completo</label>
+            <input type="text" id="nomOut" placeholder="Nombre del beneficiario">
+            <label>Cargo en la Visión</label>
+            <select id="cargoOut">
                 <option value="Colaborador">Colaborador</option>
+                <option value="Sup General">Sup General</option>
+                <option value="Sup Auxiliar">Sup Auxiliar</option>
                 <option value="Líder">Líder</option>
-                <option value="Diaconado">Diaconado</option>
+                <option value="Hermano mayor">Hermano mayor</option>
+                <option value="Coordinador El Camino">Coordinador El Camino</option>
                 <option value="Maestro">Maestro</option>
-                <option value="Externo">Externo / Otro</option>
+                <option value="Diaconado">Diaconado</option>
+                <option value="Otros">Otros</option>
             </select>
-            <button class="btn-next" onclick="showView('viewSalidaTipo')">Siguiente</button>
-        </div>
-    </div>
 
-    <div id="viewSalidaTipo" class="hidden">
-        <h3>¿Qué entregas?</h3>
-        <div class="grid">
-            <div class="card out-type" onclick="selOutType(this, 'Mercado')"><i data-lucide="shopping-basket"></i><span>MERCADO</span></div>
-            <div class="card out-type" onclick="selOutType(this, 'Refrigerio')"><i data-lucide="coffee"></i><span>REFRIGERIO</span></div>
-            <div class="card out-type" onclick="selOutType(this, 'Paquete')"><i data-lucide="package"></i><span>PAQUETE</span></div>
-        </div>
-        <div id="boxPaqueteCat" class="hidden">
-            <p style="font-size:12px; font-weight:bold; margin-top:15px;">Tipo de Paquete:</p>
-            <div id="gridPaqueteCat" class="grid"></div>
-        </div>
-        <div class="box">
-            <input type="number" id="cantOut" value="1">
-            <button id="btnSaveOut" class="btn-next" onclick="saveSalida()">Finalizar</button>
+            <div class="toggle-container">
+                <span style="font-weight: bold; color: #065f46;">¿LLEVA MERCADO?</span>
+                <input type="checkbox" id="checkMercado" style="width: 25px; height: 25px; margin: 0;">
+            </div>
+
+            <label>Otros artículos (Opcional)</label>
+            <select id="extraCatOut">
+                <option value="Ninguno">-- Ninguno --</option>
+                <option value="Alimentos">Alimentos (Extras)</option>
+                <option value="Ropa y Textiles">Ropa y Textiles</option>
+                <option value="Medicamentos">Medicamentos</option>
+                <option value="Higiene">Higiene y Limpieza</option>
+                <option value="Útiles">Útiles Escolares</option>
+                <option value="Herramientas">Herramientas</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Misceláneos">Misceláneos / Otros</option>
+            </select>
+            <input type="text" id="extraDetalle" placeholder="Detalle de lo que lleva (ej: 2 camisas)">
+
+            <button class="btn-main" onclick="saveSalida()">FINALIZAR ENTREGA</button>
+            <button class="btn-back" onclick="showView('viewMain')">Cancelar</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2tzG-r1eKGafY6KCGW6PNlsos89nrUdoWyYJQo_yZUVFnFqyJ76TpyCilXmGoAiVH/exec";
-
-    // CLASIFICACIONES CERRADAS PARA ALIMENTOS
-    const CATS = [
-        {id: "Alimentos", icon: "apple", label: "Alimentos"},
-        {id: "Aseo", icon: "bath", label: "Aseo / Higiene"},
-        {id: "Ropa", icon: "shirt", label: "Ropa / Calzado"},
-        {id: "Otros", icon: "box", label: "Otros"}
-    ];
-
-    const PRODS = {
-        "Alimentos": ["Granos / Secos", "Proteínas (Enlatados)", "Aceites / Grasas", "Lácteos / Bebidas", "Harinas / Panadería", "Frutas / Verduras"],
-        "Aseo": ["Personal (Jabón, Crema)", "Hogar (Detergente)", "Pañales / Otros"],
-        "Ropa": ["Adulto", "Niño / Bebé", "Calzado"],
-        "Otros": ["Útiles Escolares", "Tecnología", "Herramientas", "Juguetes"]
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFZfloXfxEg0tA5kzrET0k0oVRArsGjGupZUihs2eBDHBqncdJPKn9fWTzjrVlTR5L/exec";
+    
+    const DATA_MAP = {
+        "Alimentos": { icon: "apple", items: ["Comida no perecedera", "Bebidas", "Productos perecederos", "Otro Alimento"] },
+        "Ropa y Textiles": { icon: "shirt", items: ["Ropa adultos", "Ropa niños/bebés", "Mantas y sábanas", "Calzado y accesorios", "Otro Ropa"] },
+        "Medicamentos": { icon: "pill", items: ["Venta libre (Analgesicos)", "Insumos médicos", "Otro Salud"] },
+        "Higiene": { icon: "droplets", items: ["Higiene personal", "Limpieza hogar", "Otro Limpieza"] },
+        "Útiles": { icon: "book-open", items: ["Mochilas y estuches", "Cuadernos y lápices", "Libros", "Material de arte", "Otro Útiles"] },
+        "Herramientas": { icon: "wrench", items: ["Manuales", "Eléctricas pequeñas", "Clavos/Repuestos", "Construcción", "Otro Herramientas"] },
+        "Tecnología": { icon: "smartphone", items: ["Teléfonos/Tablets", "Accesorios (Cables)", "Pequeños electrodomésticos", "Otro Tech"] },
+        "Misceláneos": { icon: "package", items: ["Perfumes/Cremas", "Juguetes/Adornos", "Muebles pequeños", "Otro Misceláneo"] }
     };
 
-    let flow = { start: 0, sede: localStorage.getItem('p_sede') || "", cat: "", prod: "", outType: "", outPaqCat: "" };
+    let flow = { start: 0, sede: localStorage.getItem('p_sede') || "Sede General", cat: "", prod: "" };
 
     window.onload = () => {
         const urlP = new URLSearchParams(window.location.search);
-        const clave = urlP.get('clave') || localStorage.getItem('p_clave');
-        if (clave) validarAcceso(clave);
-        renderGrids();
+        if(urlP.get('sede')) {
+            flow.sede = urlP.get('sede');
+            localStorage.setItem('p_sede', flow.sede);
+        }
+        document.getElementById('sedeDisplay').innerHTML = `<span class="badge-sede">📍 ${flow.sede}</span>`;
+        initMenu();
+        lucide.createIcons();
     };
 
-    function validarAcceso(c) {
-        fetch(`${SCRIPT_URL}?accion=validar&clave=${c}`)
-        .then(r => r.json()).then(d => {
-            if(d.status === "success") {
-                flow.sede = d.sede;
-                localStorage.setItem('p_clave', c);
-                localStorage.setItem('p_sede', d.sede);
-                document.getElementById('sedeLabel').innerText = "📍 " + d.sede;
-                showView('viewMenu');
-            }
-        });
+    function initMenu() {
+        const grid = document.getElementById('catGrid');
+        for (const [key, val] of Object.entries(DATA_MAP)) {
+            grid.innerHTML += `
+                <div class="btn-card" onclick="selectCat('${key}')">
+                    <i data-lucide="${val.icon}" size="28"></i><span>${key.toUpperCase()}</span>
+                </div>`;
+        }
     }
 
-    function renderGrids() {
-        const gIn = document.getElementById('gridIngresoCat');
-        const gPaq = document.getElementById('gridPaqueteCat');
-        CATS.forEach(c => {
-            gIn.innerHTML += `<div class="card" onclick="selCat('${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
-            gPaq.innerHTML += `<div class="card paq-cat" onclick="selPaqCat(this, '${c.id}')"><i data-lucide="${c.icon}"></i><span>${c.label}</span></div>`;
+    function selectCat(cat) {
+        flow.cat = cat;
+        document.getElementById('subCatTitle').innerText = cat;
+        const grid = document.getElementById('subCatGrid');
+        grid.innerHTML = "";
+        DATA_MAP[cat].items.forEach(item => {
+            grid.innerHTML += `
+                <div class="btn-card" onclick="selectProd('${item}')">
+                    <i data-lucide="chevron-right" size="20"></i><span>${item}</span>
+                </div>`;
         });
-        lucide.createIcons();
+        showView('viewSubCat');
+    }
+
+    function selectProd(prod) {
+        flow.prod = prod;
+        document.getElementById('prodSelTitle').innerText = prod;
+        document.getElementById('customProd').classList.toggle('hidden', !prod.includes("Otro"));
+        showView('viewFinalIngreso');
     }
 
     function showView(id) {
@@ -154,69 +189,48 @@
         lucide.createIcons();
     }
 
-    function startFlow(viewId) {
-        flow.start = Date.now();
-        showView('view' + viewId.charAt(0).toUpperCase() + viewId.slice(1));
-    }
-
-    function selCat(id) {
-        flow.cat = id;
-        document.getElementById('labelCatSel').innerText = id;
-        const gProd = document.getElementById('gridIngresoProd');
-        gProd.innerHTML = "";
-        PRODS[id].forEach(p => {
-            gProd.innerHTML += `<div class="card" onclick="selProd('${p}')"><i data-lucide="chevron-right"></i><span>${p}</span></div>`;
-        });
-        showView('viewIngresoProd');
-    }
-
-    function selProd(p) {
-        flow.prod = p;
-        document.getElementById('labelProdSel').innerText = p;
-        showView('viewIngresoFinal');
-    }
-
-    function selOutType(el, type) {
-        document.querySelectorAll('.out-type').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        flow.outType = type;
-        document.getElementById('boxPaqueteCat').classList.toggle('hidden', type !== 'Paquete');
-    }
-
-    function selPaqCat(el, cat) {
-        document.querySelectorAll('.paq-cat').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        flow.outPaqCat = cat;
-    }
-
     function saveIngreso() {
-        const btn = document.getElementById('btnSaveIn');
-        btn.disabled = true;
-        const duracion = Math.round((Date.now() - flow.start) / 1000);
-        post({
-            tipo: 'ingreso', sede: flow.sede, categoria: flow.cat, 
-            producto: flow.prod, cantidad: document.getElementById('cantIn').value,
-            observaciones: document.getElementById('obsIn').value, duracion: duracion
-        });
+        const btn = document.querySelector('#viewFinalIngreso .btn-main');
+        btn.disabled = true; btn.innerText = "GUARDANDO...";
+        
+        const finalProd = flow.prod.includes("Otro") ? document.getElementById('customProd').value : flow.prod;
+        
+        const payload = {
+            accion: "ingreso",
+            sede: flow.sede,
+            categoria: flow.cat,
+            producto: finalProd,
+            cantidad: document.getElementById('cantIn').value,
+            obs: document.getElementById('obsIn').value
+        };
+
+        google.script.run.withSuccessHandler(() => {
+            alert("Entrada registrada!");
+            location.reload();
+        }).processData(payload);
     }
 
     function saveSalida() {
-        const btn = document.getElementById('btnSaveOut');
-        btn.disabled = true;
-        const duracion = Math.round((Date.now() - flow.start) / 1000);
-        post({
-            tipo: 'salida', sede: flow.sede, cc: document.getElementById('ccOut').value,
-            nombre: document.getElementById('nomOut').value, rol: document.getElementById('rolOut').value,
-            categoria: flow.outType, 
-            producto: flow.outType === 'Paquete' ? "Paquete de " + flow.outPaqCat : flow.outType,
-            cantidad: document.getElementById('cantOut').value, duracion: duracion
-        });
-    }
+        const btn = document.querySelector('#viewSalida .btn-main');
+        if(!document.getElementById('nomOut').value) return alert("Falta nombre");
+        
+        btn.disabled = true; btn.innerText = "GUARDANDO...";
+        
+        const payload = {
+            accion: "salida",
+            sede: flow.sede,
+            cc: document.getElementById('ccOut').value,
+            nombre: document.getElementById('nomOut').value,
+            cargo: document.getElementById('cargoOut').value,
+            mercado: document.getElementById('checkMercado').checked ? "SÍ" : "NO",
+            extraCat: document.getElementById('extraCatOut').value,
+            extraDetalle: document.getElementById('extraDetalle').value
+        };
 
-    function post(obj) {
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(obj) })
-        .then(() => { alert("✅ Guardado"); location.reload(); })
-        .catch(() => { alert("Error"); location.reload(); });
+        google.script.run.withSuccessHandler(() => {
+            alert("Entrega registrada!");
+            location.reload();
+        }).processData(payload);
     }
 </script>
 </body>
