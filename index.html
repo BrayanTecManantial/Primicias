@@ -3,127 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primicias Pro v5</title>
+    <title>Primicias Premium OS</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { 
-            --primary: #4f46e5; --primary-light: #eef2ff;
-            --accent: #10b981; --bg: #f4f7fa; --text: #0f172a; 
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #10b981;
+            --bg: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #1e293b;
+            --shadow-pro: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 40px; }
-        
-        /* Loader Premium */
-        #loader { 
-            display:none; position:fixed; inset:0; background:rgba(255,255,255,0.9); 
-            z-index:1000; flex-direction:column; align-items:center; justify-content:center; 
-            backdrop-filter: blur(5px);
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(circle at top right, #e0e7ff, transparent 400px),
+                              radial-gradient(circle at bottom left, #f1f5f9, transparent 400px);
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 50px;
+            overflow-x: hidden;
         }
-        .spinner { width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+
+        /* --- LOADER PREMIUM --- */
+        #loader {
+            display:none; position:fixed; inset:0; background:rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px); z-index:1000; flex-direction:column; align-items:center; justify-content:center;
+        }
+        .loader-card {
+            background: white; padding: 40px; border-radius: 35px; box-shadow: var(--shadow-pro); text-align: center;
+            border: 1px solid rgba(255,255,255,0.5); transform: scale(0.9); animation: pop 0.3s forwards;
+        }
+        @keyframes pop { to { transform: scale(1); } }
+        .spinner { 
+            width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary); 
+            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .header { background: white; padding: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); sticky; top:0; z-index: 100; }
-        .badge-sede { background: var(--primary-light); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 12px; }
-        
+        /* --- HEADER --- */
+        .header {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
+            padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .badge-sede {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; padding: 8px 20px; border-radius: 50px; font-weight: 800; font-size: 13px;
+            box-shadow: 0 10px 15px rgba(79, 70, 229, 0.3);
+        }
+
         .container { max-width: 480px; margin: auto; padding: 20px; }
         .hidden { display: none; }
-        
-        /* Tipografía */
-        h2 { font-weight: 800; font-size: 24px; margin-bottom: 20px; letter-spacing: -0.5px; }
-        h3 { font-weight: 700; font-size: 18px; margin-bottom: 15px; color: #475569; }
+        .view-section { animation: fadeInSlide 0.5s ease-out forwards; }
+        @keyframes fadeInSlide { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
 
-        /* Botón Volver */
-        .btn-nav-back { 
-            display: inline-flex; align-items: center; gap: 5px; color: #64748b; 
-            font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 15px;
+        /* --- CARDS --- */
+        h2 { font-weight: 800; font-size: 26px; letter-spacing: -1px; margin-bottom: 25px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .card {
+            background: var(--card-bg); border-radius: 30px; padding: 30px 15px; text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: var(--shadow-pro);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer;
         }
-
-        /* Cards Grid */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .card { 
-            background: white; border-radius: 24px; padding: 25px 15px; text-align: center; 
-            border: 2px solid transparent; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
-        }
-        .card:active { transform: scale(0.95); }
-        .card.selected { border-color: var(--accent); background: #f0fdf4; }
+        .card:active { transform: scale(0.92); background: white; }
+        .card.selected { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.05); }
+        .card.selected i { color: white !important; }
         .card i { color: var(--primary); margin-bottom: 12px; }
-        .card.selected i { color: var(--accent); }
-        .card span { font-size: 13px; font-weight: 700; display: block; line-height: 1.2; }
+        .card span { font-size: 13px; font-weight: 800; display: block; text-transform: uppercase; }
 
-        /* Forms */
-        .form-label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #1e293b; }
-        input, select, textarea { 
-            width: 100%; padding: 16px; border-radius: 16px; border: 2px solid #e2e8f0; 
-            background: white; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; outline: none;
+        /* --- BOTONES Y NAV --- */
+        .btn-back { display: flex; align-items: center; gap: 8px; color: #64748b; font-weight: 700; margin-bottom: 20px; cursor: pointer; font-size: 14px; }
+        .btn-send {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; width: 100%; padding: 22px; border-radius: 25px;
+            font-weight: 800; font-size: 17px; cursor: pointer; margin-top: 20px;
+            box-shadow: 0 15px 25px rgba(79, 70, 229, 0.3); transition: 0.3s;
         }
-        input:focus { border-color: var(--primary); }
 
-        .btn-send { 
-            background: var(--primary); color: white; border: none; width: 100%; 
-            padding: 20px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer;
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); margin-top: 10px;
+        /* --- INPUTS --- */
+        input, select, textarea {
+            width: 100%; padding: 18px; border-radius: 20px; border: 2px solid #e2e8f0;
+            background: white; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; outline: none; transition: 0.3s;
         }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.1); }
+        .form-label { font-weight: 700; font-size: 14px; margin: 10px 0 8px 5px; display: block; color: #475569; }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <div class="spinner"></div>
-    <p id="loaderText" style="font-weight: 800; margin-top: 20px;">Sincronizando...</p>
+    <div class="loader-card">
+        <div class="spinner"></div>
+        <p id="loaderText" style="font-weight: 800; margin-top: 20px; color: #1e293b;">Guardando en la Nube...</p>
+    </div>
 </div>
 
 <div class="header">
-    <span id="sedeLabel" class="badge-sede">CONECTANDO...</span>
+    <span id="sedeLabel" class="badge-sede">CARGANDO SEDE...</span>
 </div>
 
 <div class="container">
-    <div id="viewMain" class="hidden">
-        <h2>Panel de Control</h2>
+    <div id="viewMain" class="hidden view-section">
+        <p style="font-weight: 700; color: #64748b; margin-bottom: 5px;">Bienvenido</p>
+        <h2>Sistema de Primicias</h2>
         <div class="grid">
-            <div class="card" onclick="showView('viewInCat')" style="grid-column: span 2; padding: 45px;">
-                <i data-lucide="package-plus" size="40"></i><span>INGRESAR PRIMICIA</span>
+            <div class="card" onclick="showView('viewInCat')" style="grid-column: span 2; padding: 45px; background: linear-gradient(135deg, #ffffff, #f8faff);">
+                <i data-lucide="arrow-down-to-line" size="44"></i><span>RECIBIR PRIMICIA</span>
             </div>
             <div class="card" onclick="showView('viewOut')" style="grid-column: span 2; padding: 45px;">
-                <i data-lucide="hand-helping" size="40"></i><span>ENTREGAR AYUDA</span>
+                <i data-lucide="shopping-cart" size="44"></i><span>ENTREGAR A PERSONA</span>
             </div>
         </div>
     </div>
 
-    <div id="viewInCat" class="hidden">
-        <div class="btn-nav-back" onclick="showView('viewMain')"><i data-lucide="chevron-left"></i> Menú Principal</div>
-        <h3>Seleccione Clasificación</h3>
+    <div id="viewInCat" class="hidden view-section">
+        <div class="btn-back" onclick="showView('viewMain')"><i data-lucide="chevron-left"></i> VOLVER AL INICIO</div>
+        <h2>Clasificación</h2>
         <div id="gridInCat" class="grid"></div>
     </div>
 
-    <div id="viewInProd" class="hidden">
-        <div class="btn-nav-back" onclick="showView('viewInCat')"><i data-lucide="chevron-left"></i> Cambiar Clasificación</div>
-        <h3 id="labelCatIn" style="color:var(--primary);"></h3>
+    <div id="viewInProd" class="hidden view-section">
+        <div class="btn-back" onclick="showView('viewInCat')"><i data-lucide="chevron-left"></i> CAMBIAR CLASIFICACIÓN</div>
+        <h2 id="labelCatIn" style="color:var(--primary); margin-bottom: 10px;"></h2>
         <div id="gridInProd" class="grid"></div>
     </div>
 
-    <div id="viewInFinal" class="hidden">
-        <div class="btn-nav-back" onclick="showView('viewInProd')"><i data-lucide="chevron-left"></i> Cambiar Producto</div>
-        <h3 id="labelProdIn"></h3>
+    <div id="viewInFinal" class="hidden view-section">
+        <div class="btn-back" onclick="showView('viewInProd')"><i data-lucide="chevron-left"></i> CAMBIAR PRODUCTO</div>
+        <h2 id="labelProdIn"></h2>
         
         <div id="boxOtroIn" class="hidden">
             <span class="form-label">Especifique el producto:</span>
-            <input type="text" id="otroInEspecifique" placeholder="¿Qué es exactamente?">
+            <input type="text" id="otroInEspecifique" placeholder="Nombre del artículo">
         </div>
 
-        <span class="form-label">Cantidad:</span>
+        <span class="form-label">Cantidad (Unidades/Kilos):</span>
         <input type="number" id="cantIn" value="1">
         
-        <span class="form-label">Observaciones:</span>
-        <textarea id="obsIn" rows="3" placeholder="Estado, vencimiento, etc..."></textarea>
+        <span class="form-label">Observación Opcional:</span>
+        <textarea id="obsIn" rows="3" placeholder="Ej: Empaque sellado, fecha de vencimiento..."></textarea>
         
-        <button class="btn-send" onclick="saveIngreso()">GUARDAR ENTRADA</button>
+        <button class="btn-send" onclick="saveIngreso()">GUARDAR EN LA HOJA</button>
     </div>
 
-    <div id="viewOut" class="hidden">
-        <div class="btn-nav-back" onclick="showView('viewMain')"><i data-lucide="chevron-left"></i> Cancelar</div>
-        <h3>Datos de Entrega</h3>
-        <input type="number" id="ccOut" placeholder="Cédula del beneficiario">
+    <div id="viewOut" class="hidden view-section">
+        <div class="btn-back" onclick="showView('viewMain')"><i data-lucide="chevron-left"></i> CANCELAR</div>
+        <h2>Datos del Recibidor</h2>
+        <input type="number" id="ccOut" placeholder="Cédula">
         <input type="text" id="nomOut" placeholder="Nombre completo">
         <select id="cargoOut">
             <option value="">Cargo en la Visión...</option>
@@ -138,35 +169,37 @@
             <option value="Otros">Otros</option>
         </select>
 
-        <h3 style="margin-top:25px;">Seleccione los artículos</h3>
+        <h2 style="margin-top: 35px;">¿Qué se lleva?</h2>
         <div class="grid">
-            <div class="card out-item" onclick="toggleSelect(this, 'MERCADO')" style="grid-column: span 2; background:#f0fdf4;">
-                <i data-lucide="shopping-basket"></i><span>LLEVA MERCADO</span>
+            <div class="card out-item" onclick="toggleSelect(this, 'MERCADO')" style="grid-column: span 2; background: #ecfdf5; border: 2px dashed #10b981;">
+                <i data-lucide="shopping-basket" size="32"></i><span>LLEVA MERCADO COMPLETO</span>
             </div>
             <div class="card out-item" onclick="toggleSelect(this, 'Alimentos')"><i data-lucide="apple"></i><span>ALIMENTOS</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Ropa')"><i data-lucide="shirt"></i><span>ROPA</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Medicamentos')"><i data-lucide="pill"></i><span>SALUD</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Higiene')"><i data-lucide="droplets"></i><span>HIGIENE</span></div>
-            <div class="card out-item" onclick="toggleSelect(this, 'Salud')"><i data-lucide="pill"></i><span>SALUD</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Útiles')"><i data-lucide="book-open"></i><span>ÚTILES</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Herramientas')"><i data-lucide="wrench"></i><span>HERR.</span></div>
-            <div class="card out-item" onclick="toggleSelect(this, 'Tecnología')"><i data-lucide="smartphone"></i><span>TECNO.</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Tecno')"><i data-lucide="smartphone"></i><span>TECNO.</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Otros')"><i data-lucide="package"></i><span>OTROS</span></div>
         </div>
 
-        <button class="btn-send" style="margin-top:30px;" onclick="saveSalida()">REGISTRAR ENTREGA</button>
+        <button class="btn-send" onclick="saveSalida()">FINALIZAR REGISTRO</button>
     </div>
 </div>
 
 <script>
-    const URL_GAS = "https://script.google.com/macros/s/AKfycbzjGitbrLRl-t4cX8Gsf9Chfw0ZDga7EIAng-WZvd1y9QnVuxEYDi_tBxQn9IBrUuYb/exec"; // RECUERDA PONER TU URL /exec
-    
+    // --- CONFIGURACIÓN ---
+    const URL_GAS = "https://script.google.com/macros/s/AKfycbzjGitbrLRl-t4cX8Gsf9Chfw0ZDga7EIAng-WZvd1y9QnVuxEYDi_tBxQn9IBrUuYb/exec";
+
     const ESTRUCTURA = {
-        "Alimentos": { icon: "apple", p: ["Comida no perecedera", "Bebidas", "Productos perecederos", "Otros Alimentos"] },
-        "Ropa y Textiles": { icon: "shirt", p: ["Ropa adultos/jóvenes", "Ropa niños/bebés", "Mantas y sábanas", "Calzado y accesorios", "Otros Ropa"] },
-        "Medicamentos y Salud": { icon: "pill", p: ["Medicamentos venta libre", "Insumos médicos", "Otros Salud"] },
+        "Alimentos": { icon: "apple", p: ["Comida no perecedera (enlatados, granos)", "Bebidas (agua, jugos, leche)", "Productos perecederos", "Otros Alimentos"] },
+        "Ropa y Textiles": { icon: "shirt", p: ["Ropa Adultos/Jóvenes", "Ropa Niños/Bebés", "Mantas, cobijas y sábanas", "Calzado y accesorios", "Otros Ropa"] },
+        "Medicamentos y Salud": { icon: "pill", p: ["Medicamentos venta libre", "Insumos médicos (gasas, vendas)", "Otros Salud"] },
         "Higiene y Limpieza": { icon: "droplets", p: ["Higiene personal", "Limpieza hogar", "Otros Aseo"] },
-        "Útiles Escolares": { icon: "book-open", p: ["Mochilas y estuches", "Cuadernos y lápices", "Libros", "Material de arte", "Otros Útiles"] },
-        "Herramientas": { icon: "wrench", p: ["Herramientas manuales", "Eléctricas pequeñas", "Clavos y repuestos", "Construcción", "Otros Herramientas"] },
-        "Tecnología": { icon: "smartphone", p: ["Teléfonos/Tablets", "Accesorios", "Electrodomésticos pequeños", "Otros Tech"] },
+        "Útiles Escolares": { icon: "book-open", p: ["Mochilas y estuches", "Cuadernos y plumas", "Libros", "Material de arte", "Otros Útiles"] },
+        "Herramientas": { icon: "wrench", p: ["Herramientas manuales", "Herramientas eléctricas", "Construcción", "Otros Herramientas"] },
+        "Tecnología": { icon: "smartphone", p: ["Equipos (Tel/Tab/Lap)", "Accesorios (Cables/Audífonos)", "Pequeños electrodomésticos", "Otros Tech"] },
         "Misceláneos": { icon: "package", p: ["Accesorios (Perfumes/Cremas)", "Juguetes y adornos", "Otros Misceláneos"] }
     };
 
@@ -207,7 +240,7 @@
     function selInProd(p) { 
         flow.prod = p; 
         document.getElementById('labelProdIn').innerText = p; 
-        document.getElementById('boxOtroIn').className = p.includes("Otros") ? "visible" : "hidden";
+        document.getElementById('boxOtroIn').className = p.toLowerCase().includes("otros") ? "view-section" : "hidden";
         showView('viewInFinal'); 
     }
 
@@ -220,7 +253,8 @@
 
     function showView(id) {
         document.querySelectorAll('.container > div').forEach(v => v.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
+        const active = document.getElementById(id);
+        active.classList.remove('hidden');
         lucide.createIcons();
     }
 
@@ -228,11 +262,10 @@
         const loader = document.getElementById('loader');
         const text = document.getElementById('loaderText');
         loader.style.display = 'flex';
-        text.innerHTML = "Enviando datos...";
-
+        
         fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {
-            text.innerHTML = "✅ ¡Guardado con éxito!";
+            text.innerHTML = "✅ ¡GUARDADO CON ÉXITO!<br><small>Volviendo al menú...</small>";
             text.style.color = "#10b981";
             setTimeout(() => { location.reload(); }, 2000);
         });
@@ -240,23 +273,15 @@
 
     function saveIngreso() {
         let pFinal = flow.prod;
-        if(pFinal.includes("Otros")) pFinal = "OTRO: " + document.getElementById('otroInEspecifique').value;
-        send({ 
-            accion: "ingreso", sede: flow.sede, categoria: flow.cat, 
-            producto: pFinal, cantidad: document.getElementById('cantIn').value, 
-            obs: document.getElementById('obsIn').value 
-        });
+        if(pFinal.toLowerCase().includes("otros")) pFinal = "ESPECIFICADO: " + document.getElementById('otroInEspecifique').value;
+        send({ accion: "ingreso", sede: flow.sede, categoria: flow.cat, producto: pFinal, cantidad: document.getElementById('cantIn').value, obs: document.getElementById('obsIn').value });
     }
 
     function saveSalida() {
-        if(!document.getElementById('nomOut').value) return alert("Ingrese el nombre");
+        if(!document.getElementById('nomOut').value || !document.getElementById('ccOut').value) return alert("Faltan datos del beneficiario");
         const m = flow.salidaArticulos.includes('MERCADO') ? 'SÍ' : 'NO';
         const a = flow.salidaArticulos.filter(i => i !== 'MERCADO').join(', ');
-        send({ 
-            accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value, 
-            nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value, 
-            mercado: m, articulos: a 
-        });
+        send({ accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value, nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value, mercado: m, articulos: a });
     }
 </script>
 </body>
