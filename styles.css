@@ -1,0 +1,158 @@
+/* DISEÑO PREMIUM - SISTEMA PRIMICIAS V6 */
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --accent: #10b981;
+    --bg-app: #f1f5f9;
+    --glass: rgba(255, 255, 255, 0.85);
+    --shadow-main: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+body {
+    background-color: var(--bg-app);
+    background-image: radial-gradient(circle at 0% 0%, #e0e7ff 0%, transparent 50%),
+                      radial-gradient(circle at 100% 100%, #f1f5f9 0%, transparent 50%);
+    background-attachment: fixed;
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Header con Efecto Glass */
+.header {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    justify-content: center;
+}
+
+.badge-sede {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 13px;
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+    letter-spacing: 0.5px;
+}
+
+/* Contenedor con Animación */
+.container {
+    max-width: 480px;
+    margin: auto;
+    padding: 25px 20px;
+}
+
+.view-section {
+    animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Tarjetas Pro */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+.card {
+    background: white;
+    border-radius: 28px;
+    padding: 30px 15px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-main);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), transparent);
+    opacity: 0; transition: 0.3s;
+}
+
+.card:hover::before { opacity: 1; }
+
+.card:active { transform: scale(0.92); }
+
+.card.selected {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 15px 20px -5px rgba(16, 185, 129, 0.4);
+}
+
+.card.selected i { color: white !important; }
+
+.card i {
+    color: var(--primary);
+    margin-bottom: 15px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.card span {
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.2px;
+}
+
+/* Inputs y Selects */
+input, select, textarea {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 22px;
+    padding: 18px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.3s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.15);
+}
+
+/* Botón Guardar */
+.btn-send {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 22px;
+    border-radius: 24px;
+    font-weight: 800;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.3);
+    transition: 0.4s;
+}
+
+.btn-send:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 25px 30px -5px rgba(79, 70, 229, 0.4);
+}
+
+/* Loader Pro */
+#loader {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.loader-card {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: var(--shadow-main);
+    text-align: center;
+}
