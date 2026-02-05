@@ -3,91 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Primicias V4</title>
+    <title>Primicias Pro V4</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --primary: #4f46e5; --secondary: #10b981; --bg: #f8fafc; --card: #ffffff; }
-        body { font-family: 'Segoe UI', system-ui; background: var(--bg); margin: 0; padding: 0; }
+        :root { --primary: #4f46e5; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
         .header { background: white; padding: 15px; text-align: center; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .container { max-width: 500px; margin: auto; padding: 15px; }
         .hidden { display: none; }
-        
-        /* Botones de Categoría Estilo App */
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .btn-card { 
-            background: var(--card); border: 1px solid #e2e8f0; border-radius: 16px; 
-            padding: 20px; text-align: center; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .btn-card:active { transform: scale(0.95); background: #f1f5f9; }
-        .btn-card i { color: var(--primary); margin-bottom: 8px; }
-        .btn-card span { font-weight: 600; font-size: 13px; color: #334155; }
-
-        /* Formulario */
-        .form-group { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px #0001; margin-bottom: 15px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .card { background: white; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 6px -1px #0001; cursor: pointer; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; }
+        .card:active { transform: scale(0.95); }
+        .card.active { border-color: var(--primary); background: #f0f4ff; }
+        .card i { color: var(--primary); margin-bottom: 8px; }
+        .card span { font-size: 12px; font-weight: 600; }
+        .form-box { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px #0001; margin-top: 15px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 12px; font-size: 16px; box-sizing: border-box; }
         .btn-main { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .btn-back { background: #64748b; color: white; border: none; width: 100%; padding: 10px; border-radius: 12px; margin-top: 10px; cursor: pointer; }
-        
-        /* Toggle Mercado */
-        .toggle-container { display: flex; align-items: center; justify-content: space-between; background: #ecfdf5; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #10b981; }
-        
-        .badge-sede { background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .btn-back { background: transparent; color: #64748b; border: none; width: 100%; padding: 10px; cursor: pointer; font-size: 14px; }
+        .badge { background: #e0e7ff; color: #4338ca; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div id="sedeDisplay"><span class="badge-sede">Cargando Sede...</span></div>
+    <div id="sedeDisplay"><span class="badge">Validando Acceso...</span></div>
 </div>
 
 <div class="container">
-    <div id="viewMain">
-        <h2 style="text-align: center; color: #1e293b;">¿Qué deseas hacer?</h2>
-        <div class="grid-menu">
-            <div class="btn-card" onclick="showView('viewIngreso')">
-                <i data-lucide="download" size="32"></i><span>RECIBIR</span>
+    <div id="viewMain" class="hidden">
+        <h2 style="text-align: center;">Gestión de Primicias</h2>
+        <div class="grid">
+            <div class="card" onclick="showView('viewIngresoCat')" style="grid-column: span 2; padding: 35px;">
+                <i data-lucide="package-plus" size="40"></i><span>RECIBIR PRIMICIA</span>
             </div>
-            <div class="btn-card" onclick="showView('viewSalida')">
-                <i data-lucide="upload" size="32"></i><span>ENTREGAR</span>
+            <div class="card" onclick="showView('viewSalida')" style="grid-column: span 2; padding: 35px;">
+                <i data-lucide="hand-helping" size="40"></i><span>ENTREGAR BENEFICIARIO</span>
             </div>
         </div>
     </div>
 
-    <div id="viewIngreso" class="hidden">
-        <h3>Selecciona Categoría</h3>
-        <div id="catGrid" class="grid-menu"></div>
+    <div id="viewIngresoCat" class="hidden">
+        <h3>Clasificación</h3>
+        <div id="gridCat" class="grid"></div>
         <button class="btn-back" onclick="showView('viewMain')">Volver</button>
     </div>
 
-    <div id="viewSubCat" class="hidden">
-        <h3 id="subCatTitle"></h3>
-        <div id="subCatGrid" class="grid-menu"></div>
-        <button class="btn-back" onclick="showView('viewIngreso')">Atrás</button>
+    <div id="viewIngresoProd" class="hidden">
+        <h3 id="labelCat"></h3>
+        <div id="gridProd" class="grid"></div>
+        <button class="btn-back" onclick="showView('viewIngresoCat')">Atrás</button>
     </div>
 
-    <div id="viewFinalIngreso" class="hidden">
-        <div class="form-group">
-            <h4 id="prodSelTitle" style="color: var(--primary);"></h4>
-            <input type="text" id="customProd" class="hidden" placeholder="¿Cuál artículo?">
-            <label>Cantidad</label>
-            <input type="number" id="cantIn" value="1">
-            <label>Observaciones</label>
-            <textarea id="obsIn" rows="3" placeholder="Ej: Buen estado, vence pronto..."></textarea>
+    <div id="viewIngresoFinal" class="hidden">
+        <div class="form-box">
+            <h4 id="labelProdFinal" style="color:var(--primary); margin-top:0;"></h4>
+            <input type="number" id="cantIn" value="1" placeholder="Cantidad">
+            <textarea id="obsIn" placeholder="Observaciones del estado..."></textarea>
             <button class="btn-main" onclick="saveIngreso()">GUARDAR ENTRADA</button>
         </div>
     </div>
 
     <div id="viewSalida" class="hidden">
-        <div class="form-group">
-            <h3>Registro de Entrega</h3>
-            <label>Cédula</label>
-            <input type="number" id="ccOut" placeholder="Sin puntos ni comas">
-            <label>Nombre Completo</label>
-            <input type="text" id="nomOut" placeholder="Nombre del beneficiario">
-            <label>Cargo en la Visión</label>
+        <div class="form-box">
+            <h3>Datos de Entrega</h3>
+            <input type="number" id="ccOut" placeholder="Cédula">
+            <input type="text" id="nomOut" placeholder="Nombre completo">
             <select id="cargoOut">
                 <option value="Colaborador">Colaborador</option>
                 <option value="Sup General">Sup General</option>
@@ -99,26 +80,22 @@
                 <option value="Diaconado">Diaconado</option>
                 <option value="Otros">Otros</option>
             </select>
-
-            <div class="toggle-container">
-                <span style="font-weight: bold; color: #065f46;">¿LLEVA MERCADO?</span>
-                <input type="checkbox" id="checkMercado" style="width: 25px; height: 25px; margin: 0;">
+            <div style="background:#f0fdf4; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:bold; font-size:14px;">¿LLEVA MERCADO?</span>
+                <input type="checkbox" id="mercadoCheck" style="width:20px; height:20px; margin:0;">
             </div>
-
-            <label>Otros artículos (Opcional)</label>
-            <select id="extraCatOut">
-                <option value="Ninguno">-- Ninguno --</option>
-                <option value="Alimentos">Alimentos (Extras)</option>
-                <option value="Ropa y Textiles">Ropa y Textiles</option>
-                <option value="Medicamentos">Medicamentos</option>
+            <label style="font-size:12px; font-weight:bold;">Artículo Adicional</label>
+            <select id="extraCat">
+                <option value="Ninguno">Ninguno</option>
+                <option value="Ropa">Ropa y Textiles</option>
+                <option value="Salud">Medicamentos y Salud</option>
                 <option value="Higiene">Higiene y Limpieza</option>
-                <option value="Útiles">Útiles Escolares</option>
+                <option value="Escolares">Útiles Escolares</option>
                 <option value="Herramientas">Herramientas</option>
                 <option value="Tecnología">Tecnología</option>
-                <option value="Misceláneos">Misceláneos / Otros</option>
+                <option value="Misceláneos">Misceláneos</option>
             </select>
-            <input type="text" id="extraDetalle" placeholder="Detalle de lo que lleva (ej: 2 camisas)">
-
+            <input type="text" id="extraDetalle" placeholder="Detalle (ej: 1 Cobija)">
             <button class="btn-main" onclick="saveSalida()">FINALIZAR ENTREGA</button>
             <button class="btn-back" onclick="showView('viewMain')">Cancelar</button>
         </div>
@@ -126,61 +103,65 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFZfloXfxEg0tA5kzrET0k0oVRArsGjGupZUihs2eBDHBqncdJPKn9fWTzjrVlTR5L/exec";
-    
-    const DATA_MAP = {
-        "Alimentos": { icon: "apple", items: ["Comida no perecedera", "Bebidas", "Productos perecederos", "Otro Alimento"] },
-        "Ropa y Textiles": { icon: "shirt", items: ["Ropa adultos", "Ropa niños/bebés", "Mantas y sábanas", "Calzado y accesorios", "Otro Ropa"] },
-        "Medicamentos": { icon: "pill", items: ["Venta libre (Analgesicos)", "Insumos médicos", "Otro Salud"] },
-        "Higiene": { icon: "droplets", items: ["Higiene personal", "Limpieza hogar", "Otro Limpieza"] },
-        "Útiles": { icon: "book-open", items: ["Mochilas y estuches", "Cuadernos y lápices", "Libros", "Material de arte", "Otro Útiles"] },
-        "Herramientas": { icon: "wrench", items: ["Manuales", "Eléctricas pequeñas", "Clavos/Repuestos", "Construcción", "Otro Herramientas"] },
-        "Tecnología": { icon: "smartphone", items: ["Teléfonos/Tablets", "Accesorios (Cables)", "Pequeños electrodomésticos", "Otro Tech"] },
-        "Misceláneos": { icon: "package", items: ["Perfumes/Cremas", "Juguetes/Adornos", "Muebles pequeños", "Otro Misceláneo"] }
+    // CAMBIA ESTO POR TU URL DE GOOGLE APPS SCRIPT
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyTgBFlrslqVlcuCPfErFKwSQV8BZgBm0-30vAUZoCY-Zv6nuWesPWURFSOFS21W7J5/exec";
+
+    const CATEGORIAS = {
+        "Alimentos": { icon: "apple", prods: ["Comida no perecedera", "Bebidas", "Productos perecederos", "Otros Alimentos"] },
+        "Ropa y Textiles": { icon: "shirt", prods: ["Ropa adultos", "Ropa niños/bebés", "Mantas y sábanas", "Calzado y accesorios"] },
+        "Medicamentos": { icon: "pill", prods: ["Venta libre", "Insumos médicos", "Otros Salud"] },
+        "Higiene": { icon: "droplets", prods: ["Higiene personal", "Limpieza hogar"] },
+        "Útiles Escolares": { icon: "book-open", prods: ["Mochilas y estuches", "Cuadernos y lápices", "Libros", "Material de arte"] },
+        "Herramientas": { icon: "wrench", prods: ["Manuales", "Eléctricas pequeñas", "Clavos/Repuestos", "Construcción"] },
+        "Tecnología": { icon: "smartphone", prods: ["Teléfonos/Tablets", "Accesorios", "Electrodomésticos pequeños"] },
+        "Misceláneos": { icon: "package", prods: ["Perfumes/Cremas", "Juguetes/Adornos", "Otros"] }
     };
 
-    let flow = { start: 0, sede: localStorage.getItem('p_sede') || "Sede General", cat: "", prod: "" };
+    let flow = { sede: localStorage.getItem('p_sede') || "", cat: "", prod: "" };
 
     window.onload = () => {
         const urlP = new URLSearchParams(window.location.search);
-        if(urlP.get('sede')) {
-            flow.sede = urlP.get('sede');
-            localStorage.setItem('p_sede', flow.sede);
+        const clave = urlP.get('clave');
+
+        if (flow.sede) {
+            initApp();
+        } else if (clave) {
+            fetch(`${WEB_APP_URL}?clave=${clave}`).then(r => r.json()).then(d => {
+                if(d.status === "success") {
+                    flow.sede = d.sede;
+                    localStorage.setItem('p_sede', d.sede);
+                    initApp();
+                } else { alert("Clave inválida"); }
+            });
+        } else {
+            document.getElementById('sedeDisplay').innerHTML = "❌ Acceso Denegado";
         }
-        document.getElementById('sedeDisplay').innerHTML = `<span class="badge-sede">📍 ${flow.sede}</span>`;
-        initMenu();
-        lucide.createIcons();
     };
 
-    function initMenu() {
-        const grid = document.getElementById('catGrid');
-        for (const [key, val] of Object.entries(DATA_MAP)) {
-            grid.innerHTML += `
-                <div class="btn-card" onclick="selectCat('${key}')">
-                    <i data-lucide="${val.icon}" size="28"></i><span>${key.toUpperCase()}</span>
-                </div>`;
+    function initApp() {
+        document.getElementById('sedeDisplay').innerHTML = `<span class="badge">📍 ${flow.sede}</span>`;
+        const grid = document.getElementById('gridCat');
+        for (const [key, val] of Object.entries(CATEGORIAS)) {
+            grid.innerHTML += `<div class="card" onclick="selectCat('${key}')"><i data-lucide="${val.icon}"></i><span>${key}</span></div>`;
         }
+        showView('viewMain');
     }
 
     function selectCat(cat) {
         flow.cat = cat;
-        document.getElementById('subCatTitle').innerText = cat;
-        const grid = document.getElementById('subCatGrid');
+        document.getElementById('labelCat').innerText = cat;
+        const grid = document.getElementById('gridProd');
         grid.innerHTML = "";
-        DATA_MAP[cat].items.forEach(item => {
-            grid.innerHTML += `
-                <div class="btn-card" onclick="selectProd('${item}')">
-                    <i data-lucide="chevron-right" size="20"></i><span>${item}</span>
-                </div>`;
+        CATEGORIAS[cat].prods.forEach(p => {
+            grid.innerHTML += `<div class="card" onclick="selectProd('${p}')"><i data-lucide="chevron-right"></i><span>${p}</span></div>`;
         });
-        showView('viewSubCat');
+        showView('viewIngresoProd');
     }
 
-    function selectProd(prod) {
-        flow.prod = prod;
-        document.getElementById('prodSelTitle').innerText = prod;
-        document.getElementById('customProd').classList.toggle('hidden', !prod.includes("Otro"));
-        showView('viewFinalIngreso');
+    function selectProd(p) {
+        flow.prod = p;
+        document.getElementById('labelProdFinal').innerText = p;
+        showView('viewIngresoFinal');
     }
 
     function showView(id) {
@@ -190,47 +171,26 @@
     }
 
     function saveIngreso() {
-        const btn = document.querySelector('#viewFinalIngreso .btn-main');
-        btn.disabled = true; btn.innerText = "GUARDANDO...";
-        
-        const finalProd = flow.prod.includes("Otro") ? document.getElementById('customProd').value : flow.prod;
-        
-        const payload = {
-            accion: "ingreso",
-            sede: flow.sede,
-            categoria: flow.cat,
-            producto: finalProd,
-            cantidad: document.getElementById('cantIn').value,
+        send({
+            accion: "ingreso", sede: flow.sede, categoria: flow.cat, 
+            producto: flow.prod, cantidad: document.getElementById('cantIn').value,
             obs: document.getElementById('obsIn').value
-        };
-
-        google.script.run.withSuccessHandler(() => {
-            alert("Entrada registrada!");
-            location.reload();
-        }).processData(payload);
+        });
     }
 
     function saveSalida() {
-        const btn = document.querySelector('#viewSalida .btn-main');
-        if(!document.getElementById('nomOut').value) return alert("Falta nombre");
-        
-        btn.disabled = true; btn.innerText = "GUARDANDO...";
-        
-        const payload = {
-            accion: "salida",
-            sede: flow.sede,
-            cc: document.getElementById('ccOut').value,
-            nombre: document.getElementById('nomOut').value,
-            cargo: document.getElementById('cargoOut').value,
-            mercado: document.getElementById('checkMercado').checked ? "SÍ" : "NO",
-            extraCat: document.getElementById('extraCatOut').value,
-            extraDetalle: document.getElementById('extraDetalle').value
-        };
+        send({
+            accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value,
+            nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value,
+            mercado: document.getElementById('mercadoCheck').checked ? "SÍ" : "NO",
+            extraCat: document.getElementById('extraCat').value, extraDetalle: document.getElementById('extraDetalle').value
+        });
+    }
 
-        google.script.run.withSuccessHandler(() => {
-            alert("Entrega registrada!");
-            location.reload();
-        }).processData(payload);
+    function send(data) {
+        document.querySelectorAll('.btn-main').forEach(b => b.disabled = true);
+        fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        .then(() => { alert("✅ Registro Exitoso"); location.reload(); });
     }
 </script>
 </body>
