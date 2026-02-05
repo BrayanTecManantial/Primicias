@@ -3,163 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sede Primicias</title>
+    <title>Primicias Premium</title>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --bg: #f1f5f9; --card: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        .header { background: white; padding: 15px; text-align: center; border-bottom: 2px solid #e2e8f0; }
-        .container { max-width: 500px; margin: auto; padding: 15px; }
+        :root { --primary: #4f46e5; --accent: #10b981; --bg: #f8fafc; --text: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        
+        /* Loading Overlay */
+        #loader { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:1000; flex-direction:column; align-items:center; justify-content:center; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .header { background: white; padding: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); sticky; top:0; }
+        .container { max-width: 450px; margin: auto; padding: 20px; }
         .hidden { display: none; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        /* Cards */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .card { 
-            background: var(--card); border-radius: 12px; padding: 20px; text-align: center; 
-            box-shadow: 0 2px 4px #0001; cursor: pointer; border: 2px solid transparent;
+            background: white; border-radius: 20px; padding: 20px; text-align: center; 
+            border: 2px solid transparent; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.2s; cursor: pointer;
         }
-        .card:active { transform: scale(0.98); background: #f8fafc; }
+        .card:active { transform: scale(0.95); }
+        .card.selected { border-color: var(--accent); background: #f0fdf4; }
         .card i { color: var(--primary); margin-bottom: 10px; }
-        .card span { font-size: 13px; font-weight: bold; display: block; line-height: 1.2; }
-        .form-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px #0001; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-size: 16px; }
-        .btn-main { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-back { background: #64748b; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; }
-        .item-row { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 5px; border: 1px solid #e2e8f0; }
+        .card.selected i { color: var(--accent); }
+        .card span { font-size: 13px; font-weight: 700; display: block; }
+
+        /* Forms */
+        input, select, textarea { 
+            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0; 
+            background: white; font-size: 16px; margin-bottom: 12px; box-sizing: border-box;
+        }
+        .btn-send { 
+            background: var(--primary); color: white; border: none; width: 100%; 
+            padding: 18px; border-radius: 16px; font-weight: 800; cursor: pointer;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+        .section-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: #1e293b; }
     </style>
 </head>
 <body>
 
+<div id="loader">
+    <div class="spinner"></div>
+    <p style="font-weight: 700; margin-top: 15px;">Guardando en la Nube...</p>
+</div>
+
 <div class="header">
-    <span id="sedeLabel" style="background:#dbeafe; color:#1e40af; padding:5px 15px; border-radius:20px; font-weight:bold; font-size:12px;">Cargando...</span>
+    <span id="sedeLabel" style="background:#f1f5f9; padding:8px 16px; border-radius:12px; font-weight:800; color:var(--primary);">Verificando...</span>
 </div>
 
 <div class="container">
     <div id="viewMain" class="hidden">
-        <h2 style="text-align:center;">Módulo Primicias</h2>
+        <h2 class="section-title">Panel de Control</h2>
         <div class="grid">
-            <div class="card" onclick="showView('viewIngresoCat')" style="grid-column: span 2; padding: 40px;">
-                <i data-lucide="package-plus" size="32"></i><span>RECIBIR PRIMICIA1</span>
+            <div class="card" onclick="showView('viewInCat')" style="grid-column: span 2; padding: 40px;">
+                <i data-lucide="arrow-down-to-line" size="40"></i><span>INGRESAR PRIMICIA</span>
             </div>
-            <div class="card" onclick="showView('viewSalida')" style="grid-column: span 2; padding: 40px;">
-                <i data-lucide="hand-helping" size="32"></i><span>ENTREGAR A PERSONA</span>
+            <div class="card" onclick="showView('viewOut')" style="grid-column: span 2; padding: 40px;">
+                <i data-lucide="shopping-cart" size="40"></i><span>ENTREGAR AYUDA</span>
             </div>
         </div>
     </div>
 
-    <div id="viewIngresoCat" class="hidden">
-        <h3>¿Qué categoría entra?</h3>
-        <div id="gridCat" class="grid"></div>
-        <button class="btn-back" onclick="showView('viewMain')">Volver</button>
+    <div id="viewInCat" class="hidden">
+        <h3 class="section-title">Clasificación</h3>
+        <div id="gridInCat" class="grid"></div>
+        <button onclick="showView('viewMain')" style="background:none; border:none; width:100%; margin-top:20px; color:#64748b; font-weight:bold;">← Volver</button>
     </div>
 
-    <div id="viewIngresoProd" class="hidden">
-        <h3 id="catTitle"></h3>
-        <div id="gridProd" class="grid"></div>
-        <button class="btn-back" onclick="showView('viewIngresoCat')">Atrás</button>
+    <div id="viewInProd" class="hidden">
+        <h3 id="labelCatIn" class="section-title"></h3>
+        <div id="gridInProd" class="grid"></div>
     </div>
 
-    <div id="viewIngresoFinal" class="hidden">
-        <div class="form-box">
-            <h4 id="prodTitle" style="color:var(--primary);"></h4>
-            <label>Cantidad:</label>
-            <input type="number" id="cantIn" value="1">
-            <label>Observación (Opcional):</label>
-            <textarea id="obsIn" placeholder="Ej: Vence pronto, caja dañada..."></textarea>
-            <button class="btn-main" onclick="saveIngreso()">GUARDAR ENTRADA</button>
-        </div>
+    <div id="viewInFinal" class="hidden">
+        <h3 id="labelProdIn" style="color:var(--primary);"></h3>
+        <input type="number" id="cantIn" value="1">
+        <textarea id="obsIn" placeholder="Observaciones adicionales..."></textarea>
+        <button class="btn-send" onclick="saveIngreso()">REGISTRAR ENTRADA</button>
     </div>
 
-    <div id="viewSalida" class="hidden">
-        <div class="form-box">
-            <h3>Registro de Entrega</h3>
-            <input type="number" id="ccOut" placeholder="Cédula">
-            <input type="text" id="nomOut" placeholder="Nombre completo">
-            <select id="cargoOut">
-                <option value="">-- Cargo en la Visión --</option>
-                <option value="Colaborador">Colaborador</option>
-                <option value="Area">Area</option>
-                <option value="Sup General">Sup General</option>
-                <option value="Sup Auxiliar">Sup Auxiliar</option>
-                <option value="Líder">Líder</option>
-                <option value="Hermano mayor">Hermano mayor</option>
-                <option value="Coordinador El Camino">Coordinador El Camino</option>
-                <option value="Maestro">Maestro</option>
-                <option value="Diaconado">Diaconado</option>
-                <option value="Otros">Otros</option>
-            </select>
+    <div id="viewOut" class="hidden">
+        <h3 class="section-title">Datos del Beneficiario</h3>
+        <input type="number" id="ccOut" placeholder="Cédula">
+        <input type="text" id="nomOut" placeholder="Nombre completo">
+        <select id="cargoOut">
+            <option value="">Cargo...</option>
+            <option value="Colaborador">Colaborador</option>
+            <option value="Líder">Líder</option>
+            <option value="Diaconado">Diaconado</option>
+            <option value="Maestro">Maestro</option>
+            <option value="Sup General">Sup General</option>
+            <option value="Otros">Otros</option>
+        </select>
 
-            <div class="item-row" style="background:#f0fdf4;">
-                <b>¿LLEVA MERCADO?</b>
-                <input type="checkbox" id="checkMercado" style="width:20px; height:20px;">
+        <h3 class="section-title" style="margin-top:30px;">¿Qué se entrega?</h3>
+        <div class="grid">
+            <div class="card out-item" onclick="toggleSelect(this, 'MERCADO')" style="grid-column: span 2; background:#f0fdf4;">
+                <i data-lucide="shopping-basket"></i><span>LLEVA MERCADO</span>
             </div>
-
-            <label>Artículos Adicionales:</label>
-            <textarea id="extrasOut" placeholder="Especifique qué otros artículos lleva..."></textarea>
-            
-            <button class="btn-main" onclick="saveSalida()">REGISTRAR ENTREGA</button>
-            <button class="btn-back" onclick="showView('viewMain')">Cancelar</button>
+            <div class="card out-item" onclick="toggleSelect(this, 'Ropa')"><i data-lucide="shirt"></i><span>ROPA</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Salud')"><i data-lucide="pill"></i><span>SALUD</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Higiene')"><i data-lucide="droplets"></i><span>HIGIENE</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Útiles')"><i data-lucide="book-open"></i><span>ÚTILES</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Herramientas')"><i data-lucide="wrench"></i><span>HERRAMIENTAS</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Tecno')"><i data-lucide="smartphone"></i><span>TECNO</span></div>
         </div>
+
+        <button class="btn-send" style="margin-top:30px;" onclick="saveSalida()">FINALIZAR Y GUARDAR</button>
     </div>
 </div>
 
 <script>
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwoqOCXZFd6rw82Hb8nA4RJFc21BKhfsjWqLfzdWQPkSLp7G84Cniao6EByabZhma-n/exec";
-
+    const URL_GAS = "https://script.google.com/macros/s/AKfycbzjGitbrLRl-t4cX8Gsf9Chfw0ZDga7EIAng-WZvd1y9QnVuxEYDi_tBxQn9IBrUuYb/exec";
     const ESTRUCTURA = {
-        "Alimentos": { icon: "apple", prods: ["Comida no perecedera", "Bebidas", "Perecederos", "Otros Alimentos"] },
-        "Ropa y Textiles": { icon: "shirt", prods: ["Ropa Adulto/Joven", "Ropa Niños/Bebé", "Mantas/Sábanas", "Calzado/Accesorios"] },
-        "Medicamentos y Salud": { icon: "pill", prods: ["Venta libre", "Insumos médicos", "Otros Salud"] },
-        "Higiene y Limpieza": { icon: "droplets", prods: ["Higiene Personal", "Limpieza Hogar", "Otros Aseo"] },
-        "Útiles Escolares": { icon: "book-open", prods: ["Mochilas/Estuches", "Cuadernos/Lápices", "Libros", "Material Arte"] },
-        "Herramientas": { icon: "wrench", prods: ["Manuales", "Eléctricas pequeñas", "Clavos/Cintas/Piezas", "Construcción"] },
-        "Tecnología": { icon: "smartphone", prods: ["Teléfonos/Tablets/Laptops", "Accesorios", "Pequeños Electrodomésticos"] },
-        "Misceláneos/Otros": { icon: "package", prods: ["Accesorios (Perfumes/Cremas)", "Juguetes/Adornos/Muebles"] }
+        "Alimentos": { icon: "apple", p: ["Comida no perecedera", "Bebidas", "Perecederos"] },
+        "Ropa y Textiles": { icon: "shirt", p: ["Adulto", "Niños", "Mantas/Sábanas", "Calzado"] },
+        "Medicamentos y Salud": { icon: "pill", p: ["Venta libre", "Insumos médicos"] },
+        "Higiene y Limpieza": { icon: "droplets", p: ["Higiene Personal", "Limpieza Hogar"] },
+        "Útiles Escolares": { icon: "book-open", p: ["Mochilas", "Cuadernos/Lápices", "Libros", "Arte"] },
+        "Herramientas": { icon: "wrench", p: ["Manuales", "Eléctricas", "Construcción"] },
+        "Tecnología": { icon: "smartphone", p: ["Teléfonos/Tablets", "Accesorios", "Pequeños Electro"] },
+        "Misceláneos": { icon: "package", p: ["Accesorios/Cremas", "Juguetes/Otros"] }
     };
 
-    let flow = { sede: localStorage.getItem('p_sede') || "", cat: "", prod: "" };
+    let flow = { sede: localStorage.getItem('p_sede') || "", cat: "", prod: "", salidaArticulos: [] };
 
     window.onload = () => {
         const urlP = new URLSearchParams(window.location.search);
         const clave = urlP.get('clave');
-
-        if (flow.sede) {
-            startApp();
-        } else if (clave) {
-            fetch(`${GOOGLE_URL}?clave=${clave}`).then(r => r.json()).then(d => {
-                if(d.status === "success") {
-                    flow.sede = d.sede;
-                    localStorage.setItem('p_sede', d.sede);
-                    startApp();
-                } else { alert("Acceso inválido"); }
+        if (flow.sede) startApp();
+        else if (clave) {
+            fetch(`${URL_GAS}?clave=${clave}`).then(r => r.json()).then(d => {
+                if(d.status === "success") { flow.sede = d.sede; localStorage.setItem('p_sede', d.sede); startApp(); }
             });
-        } else {
-            document.getElementById('sedeLabel').innerText = "Acceso Denegado";
         }
     };
 
     function startApp() {
         document.getElementById('sedeLabel').innerText = "📍 " + flow.sede;
-        const grid = document.getElementById('gridCat');
+        const grid = document.getElementById('gridInCat');
         for (const [key, val] of Object.entries(ESTRUCTURA)) {
-            grid.innerHTML += `<div class="card" onclick="selCat('${key}')"><i data-lucide="${val.icon}"></i><span>${key}</span></div>`;
+            grid.innerHTML += `<div class="card" onclick="selInCat('${key}')"><i data-lucide="${val.icon}"></i><span>${key}</span></div>`;
         }
         showView('viewMain');
     }
 
-    function selCat(cat) {
+    function selInCat(cat) {
         flow.cat = cat;
-        document.getElementById('catTitle').innerText = cat;
-        const grid = document.getElementById('gridProd');
+        document.getElementById('labelCatIn').innerText = cat;
+        const grid = document.getElementById('gridInProd');
         grid.innerHTML = "";
-        ESTRUCTURA[cat].prods.forEach(p => {
-            grid.innerHTML += `<div class="card" onclick="selProd('${p}')"><i data-lucide="chevron-right"></i><span>${p}</span></div>`;
+        ESTRUCTURA[cat].p.forEach(p => {
+            grid.innerHTML += `<div class="card" onclick="selInProd('${p}')"><i data-lucide="chevron-right"></i><span>${p}</span></div>`;
         });
-        showView('viewIngresoProd');
+        showView('viewInProd');
     }
 
-    function selProd(p) {
-        flow.prod = p;
-        document.getElementById('prodTitle').innerText = p;
-        showView('viewIngresoFinal');
+    function selInProd(p) { flow.prod = p; document.getElementById('labelProdIn').innerText = p; showView('viewInFinal'); }
+
+    function toggleSelect(el, item) {
+        el.classList.toggle('selected');
+        const index = flow.salidaArticulos.indexOf(item);
+        if (index > -1) flow.salidaArticulos.splice(index, 1);
+        else flow.salidaArticulos.push(item);
     }
 
     function showView(id) {
@@ -169,26 +180,21 @@
     }
 
     function saveIngreso() {
-        sendData({
-            accion: "ingreso", sede: flow.sede, categoria: flow.cat, 
-            producto: flow.prod, cantidad: document.getElementById('cantIn').value,
-            obs: document.getElementById('obsIn').value
-        });
+        const data = { accion: "ingreso", sede: flow.sede, categoria: flow.cat, producto: flow.prod, cantidad: document.getElementById('cantIn').value, obs: document.getElementById('obsIn').value };
+        send(data);
     }
 
     function saveSalida() {
-        if(!document.getElementById('nomOut').value) return alert("Ingrese Nombre");
-        sendData({
-            accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value,
-            nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value,
-            mercado: document.getElementById('checkMercado').checked ? "SÍ" : "NO",
-            articulosExtra: document.getElementById('extrasOut').value
-        });
+        const mercado = flow.salidaArticulos.includes('MERCADO') ? 'SÍ' : 'NO';
+        const otros = flow.salidaArticulos.filter(i => i !== 'MERCADO').join(', ');
+        const data = { accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value, nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value, mercado: mercado, articulos: otros };
+        send(data);
     }
 
-    function sendData(data) {
-        fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
-        .then(() => { alert("Guardado con éxito"); location.reload(); });
+    function send(data) {
+        document.getElementById('loader').style.display = 'flex';
+        fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        .then(() => { setTimeout(() => { alert("Registro Exitoso"); location.reload(); }, 500); });
     }
 </script>
 </body>
