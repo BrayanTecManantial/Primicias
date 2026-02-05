@@ -3,132 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primicias Premium</title>
+    <title>Primicias Pro v5</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4f46e5; --accent: #10b981; --bg: #f8fafc; --text: #0f172a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        :root { 
+            --primary: #4f46e5; --primary-light: #eef2ff;
+            --accent: #10b981; --bg: #f4f7fa; --text: #0f172a; 
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 40px; }
         
-        /* Loading Overlay */
-        #loader { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:1000; flex-direction:column; align-items:center; justify-content:center; }
+        /* Loader Premium */
+        #loader { 
+            display:none; position:fixed; inset:0; background:rgba(255,255,255,0.9); 
+            z-index:1000; flex-direction:column; align-items:center; justify-content:center; 
+            backdrop-filter: blur(5px);
+        }
         .spinner { width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .header { background: white; padding: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); sticky; top:0; }
-        .container { max-width: 450px; margin: auto; padding: 20px; }
+        .header { background: white; padding: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); sticky; top:0; z-index: 100; }
+        .badge-sede { background: var(--primary-light); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 12px; }
+        
+        .container { max-width: 480px; margin: auto; padding: 20px; }
         .hidden { display: none; }
         
-        /* Cards */
+        /* Tipografía */
+        h2 { font-weight: 800; font-size: 24px; margin-bottom: 20px; letter-spacing: -0.5px; }
+        h3 { font-weight: 700; font-size: 18px; margin-bottom: 15px; color: #475569; }
+
+        /* Botón Volver */
+        .btn-nav-back { 
+            display: inline-flex; align-items: center; gap: 5px; color: #64748b; 
+            font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 15px;
+        }
+
+        /* Cards Grid */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .card { 
-            background: white; border-radius: 20px; padding: 20px; text-align: center; 
-            border: 2px solid transparent; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            transition: all 0.2s; cursor: pointer;
+            background: white; border-radius: 24px; padding: 25px 15px; text-align: center; 
+            border: 2px solid transparent; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
         }
         .card:active { transform: scale(0.95); }
         .card.selected { border-color: var(--accent); background: #f0fdf4; }
-        .card i { color: var(--primary); margin-bottom: 10px; }
+        .card i { color: var(--primary); margin-bottom: 12px; }
         .card.selected i { color: var(--accent); }
-        .card span { font-size: 13px; font-weight: 700; display: block; }
+        .card span { font-size: 13px; font-weight: 700; display: block; line-height: 1.2; }
 
         /* Forms */
+        .form-label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #1e293b; }
         input, select, textarea { 
-            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0; 
-            background: white; font-size: 16px; margin-bottom: 12px; box-sizing: border-box;
+            width: 100%; padding: 16px; border-radius: 16px; border: 2px solid #e2e8f0; 
+            background: white; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; outline: none;
         }
+        input:focus { border-color: var(--primary); }
+
         .btn-send { 
             background: var(--primary); color: white; border: none; width: 100%; 
-            padding: 18px; border-radius: 16px; font-weight: 800; cursor: pointer;
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+            padding: 20px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); margin-top: 10px;
         }
-        .section-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: #1e293b; }
     </style>
 </head>
 <body>
 
 <div id="loader">
     <div class="spinner"></div>
-    <p style="font-weight: 700; margin-top: 15px;">Guardando en la Nube...</p>
+    <p id="loaderText" style="font-weight: 800; margin-top: 20px;">Sincronizando...</p>
 </div>
 
 <div class="header">
-    <span id="sedeLabel" style="background:#f1f5f9; padding:8px 16px; border-radius:12px; font-weight:800; color:var(--primary);">Verificando...</span>
+    <span id="sedeLabel" class="badge-sede">CONECTANDO...</span>
 </div>
 
 <div class="container">
     <div id="viewMain" class="hidden">
-        <h2 class="section-title">Panel de Control</h2>
+        <h2>Panel de Control</h2>
         <div class="grid">
-            <div class="card" onclick="showView('viewInCat')" style="grid-column: span 2; padding: 40px;">
-                <i data-lucide="arrow-down-to-line" size="40"></i><span>INGRESAR PRIMICIA</span>
+            <div class="card" onclick="showView('viewInCat')" style="grid-column: span 2; padding: 45px;">
+                <i data-lucide="package-plus" size="40"></i><span>INGRESAR PRIMICIA</span>
             </div>
-            <div class="card" onclick="showView('viewOut')" style="grid-column: span 2; padding: 40px;">
-                <i data-lucide="shopping-cart" size="40"></i><span>ENTREGAR BENEFICIARIO</span>
+            <div class="card" onclick="showView('viewOut')" style="grid-column: span 2; padding: 45px;">
+                <i data-lucide="hand-helping" size="40"></i><span>ENTREGAR AYUDA</span>
             </div>
         </div>
     </div>
 
     <div id="viewInCat" class="hidden">
-        <h3 class="section-title">Clasificación</h3>
+        <div class="btn-nav-back" onclick="showView('viewMain')"><i data-lucide="chevron-left"></i> Menú Principal</div>
+        <h3>Seleccione Clasificación</h3>
         <div id="gridInCat" class="grid"></div>
-        <button onclick="showView('viewMain')" style="background:none; border:none; width:100%; margin-top:20px; color:#64748b; font-weight:bold;">← Volver</button>
     </div>
 
     <div id="viewInProd" class="hidden">
-        <h3 id="labelCatIn" class="section-title"></h3>
+        <div class="btn-nav-back" onclick="showView('viewInCat')"><i data-lucide="chevron-left"></i> Cambiar Clasificación</div>
+        <h3 id="labelCatIn" style="color:var(--primary);"></h3>
         <div id="gridInProd" class="grid"></div>
     </div>
 
     <div id="viewInFinal" class="hidden">
-        <h3 id="labelProdIn" style="color:var(--primary);"></h3>
+        <div class="btn-nav-back" onclick="showView('viewInProd')"><i data-lucide="chevron-left"></i> Cambiar Producto</div>
+        <h3 id="labelProdIn"></h3>
+        
+        <div id="boxOtroIn" class="hidden">
+            <span class="form-label">Especifique el producto:</span>
+            <input type="text" id="otroInEspecifique" placeholder="¿Qué es exactamente?">
+        </div>
+
+        <span class="form-label">Cantidad:</span>
         <input type="number" id="cantIn" value="1">
-        <textarea id="obsIn" placeholder="Observaciones adicionales..."></textarea>
-        <button class="btn-send" onclick="saveIngreso()">REGISTRAR ENTRADA</button>
+        
+        <span class="form-label">Observaciones:</span>
+        <textarea id="obsIn" rows="3" placeholder="Estado, vencimiento, etc..."></textarea>
+        
+        <button class="btn-send" onclick="saveIngreso()">GUARDAR ENTRADA</button>
     </div>
 
     <div id="viewOut" class="hidden">
-        <h3 class="section-title">Datos del Beneficiario</h3>
-        <input type="number" id="ccOut" placeholder="Cédula">
+        <div class="btn-nav-back" onclick="showView('viewMain')"><i data-lucide="chevron-left"></i> Cancelar</div>
+        <h3>Datos de Entrega</h3>
+        <input type="number" id="ccOut" placeholder="Cédula del beneficiario">
         <input type="text" id="nomOut" placeholder="Nombre completo">
         <select id="cargoOut">
-            <option value="">Cargo...</option>
+            <option value="">Cargo en la Visión...</option>
             <option value="Colaborador">Colaborador</option>
             <option value="Líder">Líder</option>
-            <option value="Diaconado">Diaconado</option>
             <option value="Maestro">Maestro</option>
+            <option value="Diaconado">Diaconado</option>
             <option value="Sup General">Sup General</option>
+            <option value="Sup Auxiliar">Sup Auxiliar</option>
+            <option value="Hermano mayor">Hermano mayor</option>
+            <option value="Coordinador El Camino">Coordinador El Camino</option>
             <option value="Otros">Otros</option>
         </select>
 
-        <h3 class="section-title" style="margin-top:30px;">¿Qué se entrega?</h3>
+        <h3 style="margin-top:25px;">Seleccione los artículos</h3>
         <div class="grid">
             <div class="card out-item" onclick="toggleSelect(this, 'MERCADO')" style="grid-column: span 2; background:#f0fdf4;">
                 <i data-lucide="shopping-basket"></i><span>LLEVA MERCADO</span>
             </div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Alimentos')"><i data-lucide="apple"></i><span>ALIMENTOS</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Ropa')"><i data-lucide="shirt"></i><span>ROPA</span></div>
-            <div class="card out-item" onclick="toggleSelect(this, 'Salud')"><i data-lucide="pill"></i><span>SALUD</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Higiene')"><i data-lucide="droplets"></i><span>HIGIENE</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Salud')"><i data-lucide="pill"></i><span>SALUD</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Útiles')"><i data-lucide="book-open"></i><span>ÚTILES</span></div>
-            <div class="card out-item" onclick="toggleSelect(this, 'Herramientas')"><i data-lucide="wrench"></i><span>HERRAMIENTAS</span></div>
-            <div class="card out-item" onclick="toggleSelect(this, 'Tecno')"><i data-lucide="smartphone"></i><span>TECNO</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Herramientas')"><i data-lucide="wrench"></i><span>HERR.</span></div>
+            <div class="card out-item" onclick="toggleSelect(this, 'Tecnología')"><i data-lucide="smartphone"></i><span>TECNO.</span></div>
         </div>
 
-        <button class="btn-send" style="margin-top:30px;" onclick="saveSalida()">FINALIZAR Y GUARDAR</button>
+        <button class="btn-send" style="margin-top:30px;" onclick="saveSalida()">REGISTRAR ENTREGA</button>
     </div>
 </div>
 
 <script>
-    const URL_GAS = "https://script.google.com/macros/s/AKfycbzjGitbrLRl-t4cX8Gsf9Chfw0ZDga7EIAng-WZvd1y9QnVuxEYDi_tBxQn9IBrUuYb/exec";
+    const URL_GAS = "https://script.google.com/macros/s/AKfycbzjGitbrLRl-t4cX8Gsf9Chfw0ZDga7EIAng-WZvd1y9QnVuxEYDi_tBxQn9IBrUuYb/exec"; // RECUERDA PONER TU URL /exec
+    
     const ESTRUCTURA = {
-        "Alimentos": { icon: "apple", p: ["Comida no perecedera", "Bebidas", "Perecederos"] },
-        "Ropa y Textiles": { icon: "shirt", p: ["Adulto", "Niños", "Mantas/Sábanas", "Calzado"] },
-        "Medicamentos y Salud": { icon: "pill", p: ["Venta libre", "Insumos médicos"] },
-        "Higiene y Limpieza": { icon: "droplets", p: ["Higiene Personal", "Limpieza Hogar"] },
-        "Útiles Escolares": { icon: "book-open", p: ["Mochilas", "Cuadernos/Lápices", "Libros", "Arte"] },
-        "Herramientas": { icon: "wrench", p: ["Manuales", "Eléctricas", "Construcción"] },
-        "Tecnología": { icon: "smartphone", p: ["Teléfonos/Tablets", "Accesorios", "Pequeños Electro"] },
-        "Misceláneos": { icon: "package", p: ["Accesorios/Cremas", "Juguetes/Otros"] }
+        "Alimentos": { icon: "apple", p: ["Comida no perecedera", "Bebidas", "Productos perecederos", "Otros Alimentos"] },
+        "Ropa y Textiles": { icon: "shirt", p: ["Ropa adultos/jóvenes", "Ropa niños/bebés", "Mantas y sábanas", "Calzado y accesorios", "Otros Ropa"] },
+        "Medicamentos y Salud": { icon: "pill", p: ["Medicamentos venta libre", "Insumos médicos", "Otros Salud"] },
+        "Higiene y Limpieza": { icon: "droplets", p: ["Higiene personal", "Limpieza hogar", "Otros Aseo"] },
+        "Útiles Escolares": { icon: "book-open", p: ["Mochilas y estuches", "Cuadernos y lápices", "Libros", "Material de arte", "Otros Útiles"] },
+        "Herramientas": { icon: "wrench", p: ["Herramientas manuales", "Eléctricas pequeñas", "Clavos y repuestos", "Construcción", "Otros Herramientas"] },
+        "Tecnología": { icon: "smartphone", p: ["Teléfonos/Tablets", "Accesorios", "Electrodomésticos pequeños", "Otros Tech"] },
+        "Misceláneos": { icon: "package", p: ["Accesorios (Perfumes/Cremas)", "Juguetes y adornos", "Otros Misceláneos"] }
     };
 
     let flow = { sede: localStorage.getItem('p_sede') || "", cat: "", prod: "", salidaArticulos: [] };
@@ -147,6 +186,7 @@
     function startApp() {
         document.getElementById('sedeLabel').innerText = "📍 " + flow.sede;
         const grid = document.getElementById('gridInCat');
+        grid.innerHTML = "";
         for (const [key, val] of Object.entries(ESTRUCTURA)) {
             grid.innerHTML += `<div class="card" onclick="selInCat('${key}')"><i data-lucide="${val.icon}"></i><span>${key}</span></div>`;
         }
@@ -164,7 +204,12 @@
         showView('viewInProd');
     }
 
-    function selInProd(p) { flow.prod = p; document.getElementById('labelProdIn').innerText = p; showView('viewInFinal'); }
+    function selInProd(p) { 
+        flow.prod = p; 
+        document.getElementById('labelProdIn').innerText = p; 
+        document.getElementById('boxOtroIn').className = p.includes("Otros") ? "visible" : "hidden";
+        showView('viewInFinal'); 
+    }
 
     function toggleSelect(el, item) {
         el.classList.toggle('selected');
@@ -179,84 +224,40 @@
         lucide.createIcons();
     }
 
-    // REEMPLAZA SOLO LA FUNCIÓN SEND Y SAVE EN TU SCRIPT DE GITHUB
+    function send(data) {
+        const loader = document.getElementById('loader');
+        const text = document.getElementById('loaderText');
+        loader.style.display = 'flex';
+        text.innerHTML = "Enviando datos...";
 
-function saveIngreso() {
-    const data = { 
-        accion: "ingreso", 
-        sede: flow.sede, 
-        categoria: flow.cat, 
-        producto: flow.prod, 
-        cantidad: document.getElementById('cantIn').value, 
-        obs: document.getElementById('obsIn').value 
-    };
-    send(data);
-}
-
-function saveSalida() {
-    if(!document.getElementById('nomOut').value || !document.getElementById('ccOut').value) {
-        alert("Por favor completa Nombre y Cédula");
-        return;
+        fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        .then(() => {
+            text.innerHTML = "✅ ¡Guardado con éxito!";
+            text.style.color = "#10b981";
+            setTimeout(() => { location.reload(); }, 2000);
+        });
     }
-    const mercado = flow.salidaArticulos.includes('MERCADO') ? 'SÍ' : 'NO';
-    const otros = flow.salidaArticulos.filter(i => i !== 'MERCADO').join(', ');
-    
-    const data = { 
-        accion: "salida", 
-        sede: flow.sede, 
-        cc: document.getElementById('ccOut').value, 
-        nombre: document.getElementById('nomOut').value, 
-        cargo: document.getElementById('cargoOut').value, 
-        mercado: mercado, 
-        articulos: otros 
-    };
-    send(data);
-}
 
-function send(data) {
-    const loader = document.getElementById('loader');
-    const loaderText = loader.querySelector('p');
-    
-    // 1. Mostrar estado de carga
-    loader.style.display = 'flex';
-    loaderText.innerText = "Enviando a la nube...";
-    loaderText.style.color = "#0f172a";
+    function saveIngreso() {
+        let pFinal = flow.prod;
+        if(pFinal.includes("Otros")) pFinal = "OTRO: " + document.getElementById('otroInEspecifique').value;
+        send({ 
+            accion: "ingreso", sede: flow.sede, categoria: flow.cat, 
+            producto: pFinal, cantidad: document.getElementById('cantIn').value, 
+            obs: document.getElementById('obsIn').value 
+        });
+    }
 
-    fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
-    .then(() => {
-        // 2. Mostrar éxito visualmente sin ventana emergente
-        loader.querySelector('.spinner').style.display = 'none'; // Escondemos el círculo
-        loaderText.innerHTML = "✅ <br> ¡Guardado con éxito!";
-        loaderText.style.color = "#10b981";
-        loaderText.style.fontSize = "20px";
-
-        // 3. Esperar 2 segundos y resetear la App al menú inicial
-        setTimeout(() => {
-            resetFormularios();
-            showView('viewMain');
-            
-            // Restaurar el loader para la próxima vez
-            loader.style.display = 'none';
-            loader.querySelector('.spinner').style.display = 'block';
-            loaderText.style.fontSize = "16px";
-        }, 2000);
-    })
-    .catch(err => {
-        alert("Error de conexión. Intente de nuevo.");
-        loader.style.display = 'none';
-    });
-}
-
-function resetFormularios() {
-    // Limpiar campos de texto
-    document.querySelectorAll('input, textarea, select').forEach(el => el.value = (el.type === 'number' ? '1' : ''));
-    // Limpiar selección de salida
-    flow.salidaArticulos = [];
-    document.querySelectorAll('.out-item').forEach(el => el.classList.remove('selected'));
-    // Resetear variables de flujo
-    flow.cat = "";
-    flow.prod = "";
-}
+    function saveSalida() {
+        if(!document.getElementById('nomOut').value) return alert("Ingrese el nombre");
+        const m = flow.salidaArticulos.includes('MERCADO') ? 'SÍ' : 'NO';
+        const a = flow.salidaArticulos.filter(i => i !== 'MERCADO').join(', ');
+        send({ 
+            accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value, 
+            nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value, 
+            mercado: m, articulos: a 
+        });
+    }
 </script>
 </body>
 </html>
