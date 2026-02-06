@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Primicias Premium OS</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -53,31 +53,42 @@
         /* --- HEADER --- */
         .header {
             background: var(--brand-dark);
-            padding: 25px 20px; text-align: center; position: sticky; top: 0; z-index: 100;
+            padding: 20px 15px; text-align: center; position: sticky; top: 0; z-index: 100;
             border-bottom: 4px solid var(--brand-lime);
             box-shadow: 0 10px 20px rgba(18, 42, 30, 0.2);
         }
+        
+        /* AJUSTE PARA QUE LA SEDE NO SE PIERDA EN CELULAR */
         .badge-sede {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(5px);
-            color: var(--brand-lime); padding: 8px 24px; border-radius: 50px; 
-            font-weight: 800; font-size: 12px; letter-spacing: 1px;
+            color: var(--brand-lime); 
+            padding: 8px 16px; 
+            border-radius: 50px; 
+            font-weight: 800; font-size: 11px; letter-spacing: 0.5px;
             border: 1px solid rgba(255,255,255,0.2);
-            display: inline-flex; align-items: center; gap: 10px; /* Alineación para el icono de borrar */
+            display: inline-flex; align-items: center; gap: 8px;
+            max-width: 90%; /* Esto evita que se salga de la pantalla */
         }
         
-        /* ESTILO DEL BOTÓN DE CERRAR SEDE */
+        .sede-nombre-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px; /* Corta el texto si es demasiado largo */
+        }
+
         .btn-reset-sede {
             background: var(--brand-coral);
             color: white; border: none; border-radius: 50%;
-            width: 18px; height: 18px; display: flex;
+            width: 20px; height: 20px; display: flex;
             align-items: center; justify-content: center;
             cursor: pointer; font-size: 10px; transition: 0.3s;
+            flex-shrink: 0; /* Evita que el botón se aplaste */
         }
-        .btn-reset-sede:hover { transform: scale(1.2); }
 
         .container { max-width: 480px; margin: auto; padding: 25px 20px; }
-        .hidden { display: none !important; } /* Forzamos el hidden */
+        .hidden { display: none !important; }
         .view-section { animation: fadeInSlide 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
         @keyframes fadeInSlide { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
 
@@ -91,23 +102,14 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
             position: relative; overflow: hidden;
         }
-
-        .card::after {
-            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent); pointer-events: none;
-        }
-
         .card:active { transform: scale(0.92); }
-
         .card.selected { 
-            background: var(--brand-dark); 
-            border-color: var(--brand-lime); 
+            background: var(--brand-dark); border-color: var(--brand-lime); 
             transform: translateY(-5px) scale(1.05);
             box-shadow: 0 20px 30px rgba(18, 42, 30, 0.2);
         }
-        .card.selected span { color: white !important; font-weight: 800; }
-        .card.selected i { color: var(--brand-lime) !important; transform: scale(1.1); }
-
+        .card.selected span { color: white !important; }
+        .card.selected i { color: var(--brand-lime) !important; }
         .card i { color: var(--brand-coral); margin-bottom: 15px; transition: 0.3s; }
         .card span { font-size: 13px; font-weight: 700; display: block; text-transform: uppercase; color: var(--brand-dark); }
 
@@ -117,18 +119,15 @@
             background: linear-gradient(135deg, var(--brand-dark), #1e4d35);
             color: white; border: none; width: 100%; padding: 22px; border-radius: 24px;
             font-weight: 800; font-size: 17px; cursor: pointer; margin-top: 25px;
-            box-shadow: 0 15px 25px rgba(18, 42, 30, 0.3); transition: 0.4s;
             text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn-send:hover { transform: translateY(-3px); box-shadow: 0 20px 30px rgba(18, 42, 30, 0.4); }
 
         /* --- INPUTS --- */
         input, select, textarea {
             width: 100%; padding: 20px; border-radius: 22px; border: 2px solid #e2e8f0;
             background: white; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; 
-            outline: none; transition: 0.3s; font-family: inherit; font-weight: 600;
+            outline: none; font-family: inherit; font-weight: 600;
         }
-        input:focus { border-color: var(--brand-coral); box-shadow: 0 0 0 5px rgba(248, 125, 125, 0.1); }
         .form-label { font-weight: 800; font-size: 13px; margin: 15px 0 8px 8px; display: block; color: #64748b; text-transform: uppercase; }
     </style>
 </head>
@@ -137,7 +136,7 @@
 <div id="loader">
     <div class="loader-card">
         <div class="spinner"></div>
-        <p id="loaderText" style="font-weight: 800; margin-top: 25px; color: var(--brand-dark); font-size: 18px;">Sincronizando con la Nube...</p>
+        <p id="loaderText" style="font-weight: 800; margin-top: 25px; color: var(--brand-dark); font-size: 18px;">Sincronizando...</p>
     </div>
 </div>
 
@@ -145,8 +144,9 @@
     <div style="margin-bottom: 10px;">
         <span style="color: white; font-weight: 900; font-size: 22px; letter-spacing: -1px;">PRIMICIAS <span style="color: var(--brand-lime);">26</span></span>
     </div>
-    <div style="display: inline-flex; align-items: center; gap: 5px;">
-        <span id="sedeLabel" class="badge-sede">CARGANDO SEDE...</span>
+    <div class="badge-sede">
+        <span id="sedeLabel" class="sede-nombre-text">CARGANDO...</span>
+        <button class="btn-reset-sede" onclick="resetSede()">✕</button>
     </div>
 </div>
 
@@ -179,18 +179,14 @@
     <div id="viewInFinal" class="hidden view-section">
         <div class="btn-back" onclick="showView('viewInProd')"><i data-lucide="arrow-left"></i> CAMBIAR PRODUCTO</div>
         <h2 id="labelProdIn"></h2>
-        
         <div id="boxOtroIn" class="hidden">
             <span class="form-label">Especifique el producto:</span>
             <input type="text" id="otroInEspecifique" placeholder="¿Qué artículo es?">
         </div>
-
         <span class="form-label">Cantidad (Unidades/Kilos):</span>
         <input type="number" id="cantIn" value="1">
-        
         <span class="form-label">Observación Opcional:</span>
-        <textarea id="obsIn" rows="3" placeholder="Ej: Empaque sellado, marca..."></textarea>
-        
+        <textarea id="obsIn" rows="3" placeholder="Ej: Empaque sellado..."></textarea>
         <button class="btn-send" onclick="saveIngreso()">GUARDAR EN LA HOJA</button>
     </div>
 
@@ -226,7 +222,6 @@
             <div class="card out-item" onclick="toggleSelect(this, 'Tecno')"><i data-lucide="smartphone"></i><span>TECNO.</span></div>
             <div class="card out-item" onclick="toggleSelect(this, 'Otros')"><i data-lucide="package"></i><span>OTROS</span></div>
         </div>
-
         <button class="btn-send" onclick="saveSalida()">FINALIZAR REGISTRO</button>
     </div>
 </div>
@@ -254,14 +249,17 @@
         else if (clave) {
             document.getElementById('loader').style.display = 'flex';
             fetch(`${URL_GAS}?clave=${clave}`).then(r => r.json()).then(d => {
-                if(d.status === "success") { flow.sede = d.sede; localStorage.setItem('p_sede', d.sede); startApp(); }
+                if(d.status === "success") { 
+                    flow.sede = d.sede; 
+                    localStorage.setItem('p_sede', d.sede); 
+                    startApp(); 
+                }
             }).finally(() => { document.getElementById('loader').style.display = 'none'; });
         }
     };
 
     function startApp() {
-        // ACTUALIZACIÓN: Mostramos la sede y el botón para resetearla si se equivocaron
-        document.getElementById('sedeLabel').innerHTML = `📍 ${flow.sede} <button class="btn-reset-sede" onclick="resetSede()">✕</button>`;
+        document.getElementById('sedeLabel').innerText = "📍 " + flow.sede;
         const grid = document.getElementById('gridInCat');
         grid.innerHTML = "";
         for (const [key, val] of Object.entries(ESTRUCTURA)) {
@@ -270,11 +268,10 @@
         showView('viewMain');
     }
 
-    // NUEVA FUNCIÓN PARA BORRAR SEDE SI SE EQUIVOCARON
     function resetSede() {
-        if(confirm("¿Deseas cambiar de sede? Se borrará la sede actual de este dispositivo.")){
+        if(confirm("¿Deseas cambiar de sede? Se borrará la actual.")){
             localStorage.removeItem('p_sede');
-            location.href = location.pathname; // Recarga la página limpia
+            location.href = location.pathname;
         }
     }
 
@@ -305,8 +302,7 @@
 
     function showView(id) {
         document.querySelectorAll('.container > div').forEach(v => v.classList.add('hidden'));
-        const active = document.getElementById(id);
-        active.classList.remove('hidden');
+        document.getElementById(id).classList.remove('hidden');
         lucide.createIcons();
     }
 
@@ -314,23 +310,21 @@
         const loader = document.getElementById('loader');
         const text = document.getElementById('loaderText');
         loader.style.display = 'flex';
-        
         fetch(URL_GAS, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {
-            text.innerHTML = "✅ ¡GUARDADO CON ÉXITO!<br><small>Redirigiendo...</small>";
-            text.style.color = "#10b981";
+            text.innerHTML = "✅ ¡ÉXITO!<br><small>Redirigiendo...</small>";
             setTimeout(() => { location.reload(); }, 2000);
         });
     }
 
     function saveIngreso() {
         let pFinal = flow.prod;
-        if(pFinal.toLowerCase().includes("otros")) pFinal = "ESPECIFICADO: " + document.getElementById('otroInEspecifique').value;
+        if(pFinal.toLowerCase().includes("otros")) pFinal = "ESP: " + document.getElementById('otroInEspecifique').value;
         send({ accion: "ingreso", sede: flow.sede, categoria: flow.cat, producto: pFinal, cantidad: document.getElementById('cantIn').value, obs: document.getElementById('obsIn').value });
     }
 
     function saveSalida() {
-        if(!document.getElementById('nomOut').value || !document.getElementById('ccOut').value) return alert("Faltan datos del beneficiario");
+        if(!document.getElementById('nomOut').value || !document.getElementById('ccOut').value) return alert("Faltan datos");
         const m = flow.salidaArticulos.includes('MERCADO') ? 'SÍ' : 'NO';
         const a = flow.salidaArticulos.filter(i => i !== 'MERCADO').join(', ');
         send({ accion: "salida", sede: flow.sede, cc: document.getElementById('ccOut').value, nombre: document.getElementById('nomOut').value, cargo: document.getElementById('cargoOut').value, mercado: m, articulos: a });
