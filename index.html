@@ -63,10 +63,21 @@
             color: var(--brand-lime); padding: 8px 24px; border-radius: 50px; 
             font-weight: 800; font-size: 12px; letter-spacing: 1px;
             border: 1px solid rgba(255,255,255,0.2);
+            display: inline-flex; align-items: center; gap: 10px; /* Alineación para el icono de borrar */
         }
+        
+        /* ESTILO DEL BOTÓN DE CERRAR SEDE */
+        .btn-reset-sede {
+            background: var(--brand-coral);
+            color: white; border: none; border-radius: 50%;
+            width: 18px; height: 18px; display: flex;
+            align-items: center; justify-content: center;
+            cursor: pointer; font-size: 10px; transition: 0.3s;
+        }
+        .btn-reset-sede:hover { transform: scale(1.2); }
 
         .container { max-width: 480px; margin: auto; padding: 25px 20px; }
-        .hidden { display: none; }
+        .hidden { display: none !important; } /* Forzamos el hidden */
         .view-section { animation: fadeInSlide 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
         @keyframes fadeInSlide { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
 
@@ -88,7 +99,6 @@
 
         .card:active { transform: scale(0.92); }
 
-        /* CORRECCIÓN: Estilo cuando está seleccionada */
         .card.selected { 
             background: var(--brand-dark); 
             border-color: var(--brand-lime); 
@@ -135,7 +145,9 @@
     <div style="margin-bottom: 10px;">
         <span style="color: white; font-weight: 900; font-size: 22px; letter-spacing: -1px;">PRIMICIAS <span style="color: var(--brand-lime);">26</span></span>
     </div>
-    <span id="sedeLabel" class="badge-sede">CARGANDO SEDE...</span>
+    <div style="display: inline-flex; align-items: center; gap: 5px;">
+        <span id="sedeLabel" class="badge-sede">CARGANDO SEDE...</span>
+    </div>
 </div>
 
 <div class="container">
@@ -220,7 +232,6 @@
 </div>
 
 <script>
-    // --- TU LÓGICA DE JAVASCRIPT SE MANTIENE 100% IGUAL ---
     const URL_GAS = "https://script.google.com/macros/s/AKfycbzjGitbrLRl-t4cX8Gsf9Chfw0ZDga7EIAng-WZvd1y9QnVuxEYDi_tBxQn9IBrUuYb/exec";
 
     const ESTRUCTURA = {
@@ -241,20 +252,30 @@
         const clave = urlP.get('clave');
         if (flow.sede) startApp();
         else if (clave) {
+            document.getElementById('loader').style.display = 'flex';
             fetch(`${URL_GAS}?clave=${clave}`).then(r => r.json()).then(d => {
                 if(d.status === "success") { flow.sede = d.sede; localStorage.setItem('p_sede', d.sede); startApp(); }
-            });
+            }).finally(() => { document.getElementById('loader').style.display = 'none'; });
         }
     };
 
     function startApp() {
-        document.getElementById('sedeLabel').innerText = "📍 " + flow.sede;
+        // ACTUALIZACIÓN: Mostramos la sede y el botón para resetearla si se equivocaron
+        document.getElementById('sedeLabel').innerHTML = `📍 ${flow.sede} <button class="btn-reset-sede" onclick="resetSede()">✕</button>`;
         const grid = document.getElementById('gridInCat');
         grid.innerHTML = "";
         for (const [key, val] of Object.entries(ESTRUCTURA)) {
             grid.innerHTML += `<div class="card" onclick="selInCat('${key}')"><i data-lucide="${val.icon}"></i><span>${key}</span></div>`;
         }
         showView('viewMain');
+    }
+
+    // NUEVA FUNCIÓN PARA BORRAR SEDE SI SE EQUIVOCARON
+    function resetSede() {
+        if(confirm("¿Deseas cambiar de sede? Se borrará la sede actual de este dispositivo.")){
+            localStorage.removeItem('p_sede');
+            location.href = location.pathname; // Recarga la página limpia
+        }
     }
 
     function selInCat(cat) {
